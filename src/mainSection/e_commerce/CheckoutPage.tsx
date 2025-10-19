@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCart } from '../../context/CartContext';
+// import { useCart } from '../../context/CartContext';
 
 
 interface CheckoutPageProps {
@@ -7,7 +7,7 @@ interface CheckoutPageProps {
 }
 
 const CheckoutPage: React.FC<CheckoutPageProps> = () => {
-  const { cart, clearCart } = useCart();
+  // const { cartItems, clearCart } = useCart();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -23,26 +23,26 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
   });
 
   // 🔹 Update this to use cart from context
-  const calculateSubtotal = () => {
-    return cart.reduce(
-      (total:any, item:any) => total + (item.price ?? 0) * (item.quantity ?? 1),
-      0
-    );
-  };
+  // const calculateSubtotal = () => {
+  //   // return cartItems.reduce(
+  //   //   (total:any, item:any) => total + (item.price ?? 0) * (item.quantity ?? 1),
+  //   //   0
+  //   // );
+  // };
 
-  const calculateGST = () => calculateSubtotal() * 0.18;
-  const calculateTotal = () => calculateSubtotal() + calculateGST();
+  // const calculateGST = () => calculateSubtotal() * 0.18;
+  // const calculateTotal = () => calculateSubtotal() + calculateGST();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log('Order submitted:', { formData, cart });
-    clearCart();
-    alert('Order placed successfully!');
-  };
+  // const handleSubmit = () => {
+  //   console.log('Order submitted:', { formData, cartItems });
+  //   clearCart();
+  //   alert('Order placed successfully!');
+  // };
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] py-8 px-4 mt-48">
@@ -174,11 +174,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Total</h3>
                   <p className="text-sm text-gray-600">
-                    Including ₹ {calculateGST().toLocaleString()} GST @18%
+                    {/* Including ₹ {calculateGST().toLocaleString()} GST @18% */}
                   </p>
                 </div>
                 <div className="text-2xl font-bold text-gray-900">
-                  ₹ {calculateTotal().toLocaleString()}
+                  {/* ₹ {calculateTotal().toLocaleString()} */}
                 </div>
               </div>
 
@@ -187,11 +187,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                 Order summary
               </h3>
 
-              {cart.length === 0 ? (
+              {/* {cartItems.length === 0 ? (
                 <p className="text-gray-600">Your cart is empty.</p>
               ) : (
                 <div className="space-y-6 mb-6">
-                  {cart.map((item:any, index:number) => (
+                  {cartItems.map((item:any, index:number) => (
                     <div key={index} className="flex gap-4">
                       <div className="w-24 h-24 flex-shrink-0">
                         <img
@@ -216,17 +216,17 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
 
               {/* Order Button */}
-              {cart.length > 0 && (
+              {/* {cartItems.length > 0 && (
                 <button
                   onClick={handleSubmit}
                   className="w-full py-4 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold text-lg"
                 >
                   Order
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         </div>
