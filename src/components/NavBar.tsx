@@ -10,10 +10,12 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
-import SignInForm from "../tools/Email";
-import logo from "../../public/novalogo.png"
+import SignInForm from "../service/Email";
+import logo from "../../public/novalogo.png";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -27,135 +29,141 @@ const NavBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-const menuItems = [
-  {
-    title: "Nova Interiors",
-    hasDropdown: true,
-    isMegaMenu: true,
-    groups: [
-      {
-        title: "Wall papers",
-        items: [
-          { label: "Ready available wall papers", path: "/interiorHome" },
-          { label: "Customised wall papers", path: "/interiorHome" },
-        ],
-      },
-      {
-        title: "Wooden flooring",
-        items: [
-          { label: "Laminated wooden flooring", path: "/flooring/laminated" },
-          { label: "SPC flooring", path: "/flooring/spc" },
-          { label: "Engineered wooden flooring", path: "/flooring/engineered" },
-          { label: "Hardwood flooring", path: "/flooring/hardwood" },
-          { label: "Carpet flooring", path: "/flooring/carpet" },
-          { label: "Vinyl flooring", path: "/flooring/vinyl" },
-        ],
-      },
-      {
-        title: "Wall decors",
-        items: [
-          { label: "Canvas prints", path: "/canvasPrint" },
-          { label: "Wall decor items", path: "/wallDecor" },
-        ],
-      },
-      {
-        title: "Wall panels",
-        items: [{ label: "PVC fluted panels", path: "/pvcFluted" }],
-      },
-      {
-        title: "Soft furnishings",
-        items: [
-          { label: "Curtains", path: "/furnishings/curtains" },
-          { label: "Cushions", path: "/furnishings/cushions" },
-          { label: "Rugs/Carpets", path: "/furnishings/rugs" },
-          { label: "Headboard", path: "/furnishings/headboard" },
-        ],
-      },
-      {
-        title: "Furniture",
-        items: [
-          { label: "Sofas", path: "/furniture/sofas" },
-          { label: "Chairs", path: "/furniture/chairs" },
-          { label: "Beds", path: "/furniture/beds" },
-          { label: "Console units", path: "/furniture/console" },
-        ],
-      },
-      {
-        title: "Lighting",
-        items: [
-          { label: "Ceiling Lights", path: "/lighting/ceiling" },
-          { label: "Wall Lights", path: "/lighting/wall" },
-          { label: "Table Lamps", path: "/lighting/table" },
-          { label: "Floor Lamps", path: "/lighting/floor" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Nova Construction",
-    hasDropdown: true,
-    isCardMenu: true,
-    items: [
-      {
-        label: "Modular interiors",
-        path: "/construction",
-        description:
-          "Interior designs made of prefabricated units that can be combined or customized.",
-      },
-      {
-        label: "Customised Premium interiors",
-        path: "/construction",
-        description:
-          "High-end interior designs tailored to your space and needs.",
-      },
-    ],
-  },
-  {
-    title: "Nova Products",
-    path:"/ourProduct",
-    hasDropdown: true,
-    isMegaMenu: true,
-    groups: [
-      {
-        title: "Wall papers",
-        items: [
-          { label: "Ready available wall papers", path: "/ourProduct" },
-          { label: "Customised wall papers", path: "/interiorHome" },
-        ],
-      },
-      {
-        title: "Wooden flooring",
-        items: [
-          { label: "Laminated wooden flooring", path: "/products/flooring/laminated" },
-          { label: "Engineered wooden flooring", path: "/products/flooring/engineered" },
-          { label: "Hardwood flooring", path: "/products/flooring/hardwood" },
-          { label: "Carpet flooring", path: "/products/flooring/carpet" },
-          { label: "Vinyl flooring", path: "/products/flooring/vinyl" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "About NovaStyles",
-    hasDropdown: false,
-    path: "/aboutus",
-  },
-];
+  const menuItems = [
+    {
+      title: "Nova Interiors",
+      hasDropdown: true,
+      isMegaMenu: true,
+      groups: [
+        {
+          title: "Wall papers",
+          items: [
+            { label: "Ready available wall papers", path: "/interiorHome" },
+            { label: "Customised wall papers", path: "/interiorHome" },
+          ],
+        },
+        {
+          title: "Wooden flooring",
+          items: [
+            { label: "Laminated wooden flooring", path: "/flooring/laminated" },
+            { label: "SPC flooring", path: "/flooring/spc" },
+            {
+              label: "Engineered wooden flooring",
+              path: "/flooring/engineered",
+            },
+            { label: "Hardwood flooring", path: "/flooring/hardwood" },
+            { label: "Carpet flooring", path: "/flooring/carpet" },
+            { label: "Vinyl flooring", path: "/flooring/vinyl" },
+          ],
+        },
+        {
+          title: "Wall decors",
+          items: [
+            { label: "Canvas prints", path: "/canvasPrint" },
+            { label: "Wall decor items", path: "/wallDecor" },
+          ],
+        },
+        {
+          title: "Wall panels",
+          items: [{ label: "PVC fluted panels", path: "/pvcFluted" }],
+        },
+        {
+          title: "Soft furnishings",
+          items: [
+            { label: "Curtains", path: "/furnishings/curtains" },
+            { label: "Cushions", path: "/furnishings/cushions" },
+            { label: "Rugs/Carpets", path: "/furnishings/rugs" },
+            { label: "Headboard", path: "/furnishings/headboard" },
+          ],
+        },
+        {
+          title: "Furniture",
+          items: [
+            { label: "Sofas", path: "/furniture/sofas" },
+            { label: "Chairs", path: "/furniture/chairs" },
+            { label: "Beds", path: "/furniture/beds" },
+            { label: "Console units", path: "/furniture/console" },
+          ],
+        },
+        {
+          title: "Lighting",
+          items: [
+            { label: "Ceiling Lights", path: "/lighting/ceiling" },
+            { label: "Wall Lights", path: "/lighting/wall" },
+            { label: "Table Lamps", path: "/lighting/table" },
+            { label: "Floor Lamps", path: "/lighting/floor" },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Nova Construction",
+      hasDropdown: true,
+      isCardMenu: true,
+      items: [
+        {
+          label: "Modular interiors",
+          path: "/construction",
+          description:
+            "Interior designs made of prefabricated units that can be combined or customized.",
+        },
+        {
+          label: "Customised Premium interiors",
+          path: "/construction",
+          description:
+            "High-end interior designs tailored to your space and needs.",
+        },
+      ],
+    },
+    {
+      title: "Nova Products",
+      path: "/ourProduct",
+      hasDropdown: true,
+      isMegaMenu: true,
+      groups: [
+        {
+          title: "Wall papers",
+          items: [
+            { label: "Ready available wall papers", path: "/ourProduct" },
+            { label: "Customised wall papers", path: "/interiorHome" },
+          ],
+        },
+        {
+          title: "Wooden flooring",
+          items: [
+            {
+              label: "Laminated wooden flooring",
+              path: "/products/flooring/laminated",
+            },
+            {
+              label: "Engineered wooden flooring",
+              path: "/products/flooring/engineered",
+            },
+            { label: "Hardwood flooring", path: "/products/flooring/hardwood" },
+            { label: "Carpet flooring", path: "/products/flooring/carpet" },
+            { label: "Vinyl flooring", path: "/products/flooring/vinyl" },
+          ],
+        },
+      ],
+    },
+    {
+      title: "About NovaStyles",
+      hasDropdown: false,
+      path: "/aboutus",
+    },
+  ];
 
-
-const productCategories = [
-  { label: "Wall papers", path: "/categories/wallpapers" },
-  { label: "Wooden flooring", path: "/categories/flooring" },
-  { label: "Wall decors", path: "/categories/walldecors" },
-  { label: "Wall panels", path: "/categories/wallpanels" },
-  { label: "Soft furnishings", path: "/categories/furnishings" },
-  { label: "Furniture", path: "/categories/furniture" },
-  { label: "Novastyles Interior", path: "/categories/interior" },
-  { label: "Canvas Prints", path: "/categories/canvasPrint" },
-  { label: "Wall decor items", path: "/categories/wallDecor" },
-];
-
-
+  const productCategories = [
+    { label: "Wall papers", path: "/categories/wallpapers" },
+    { label: "Wooden flooring", path: "/categories/flooring" },
+    { label: "Wall decors", path: "/categories/walldecors" },
+    { label: "Wall panels", path: "/categories/wallpanels" },
+    { label: "Soft furnishings", path: "/categories/furnishings" },
+    { label: "Furniture", path: "/categories/furniture" },
+    { label: "Novastyles Interior", path: "/categories/interior" },
+    { label: "Canvas Prints", path: "/categories/canvasPrint" },
+    { label: "Wall decor items", path: "/categories/wallDecor" },
+  ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -232,117 +240,117 @@ const productCategories = [
       <div className="bg-white px-4 md:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex gap-10">
-          {/* Logo */}
-          <a className="flex items-center gap-1" href="/">
-            <div className="text-amber-500">
-              <img src={logo} alt="" />
-            </div>
-          </a>
+            {/* Logo */}
+            <a className="flex items-center gap-1" href="/">
+              <div className="text-amber-500">
+                <img src={logo} alt="" />
+              </div>
+            </a>
 
-          {/* Desktop Menu */}
+            {/* Desktop Menu */}
 
-          <div className="hidden lg:flex items-center gap-8">
-            {menuItems.map((item) => (
-              <div
-                key={item.title}
-                className="relative group"
-                onMouseEnter={() => setOpenDropdown(item.title)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                {item.hasDropdown ? (
-                  <button className="flex items-center gap-1 text-gray-700 hover:text-brand transition-colors py-2">
-                    {item.title}
-                    <ChevronDown size={16} />
-                  </button>
-                ) : (
-                  <a
-                    href={item.path}
-                    className="flex items-center gap-1 text-gray-700 hover:text-brand transition-colors py-2"
-                  >
-                    {item.title}
-                  </a>
-                )}
+            <div className="hidden lg:flex items-center gap-8">
+              {menuItems.map((item) => (
+                <div
+                  key={item.title}
+                  className="relative group"
+                  onMouseEnter={() => setOpenDropdown(item.title)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  {item.hasDropdown ? (
+                    <button className="flex items-center gap-1 text-gray-700 hover:text-brand transition-colors py-2">
+                      {item.title}
+                      <ChevronDown size={16} />
+                    </button>
+                  ) : (
+                    <a
+                      href={item.path}
+                      className="flex items-center gap-1 text-gray-700 hover:text-brand transition-colors py-2"
+                    >
+                      {item.title}
+                    </a>
+                  )}
 
-                {/* Mega Menu (Nova Interiors only) */}
-                {item.isMegaMenu && openDropdown === item.title && (
-                  <div className="absolute top-full left-0 w-[800px] bg-white rounded-lg shadow-xl py-6 px-6 border border-gray-100 grid grid-cols-2 gap-8">
-                    {item.groups.map((group) => (
-                      <div key={group.title}>
-                        <a href={group.items.find((e) => e.path )?.path}>
-                        <h4 className="font-semibold text-gray-800 mb-2">
-                          {group.title}
-                        </h4>
-                        </a>
-                        <ul className="space-y-1 text-sm text-gray-600">
-                          {group.items.map((subItem) => (
-                            <li
-                              key={subItem.label}
-                              className="hover:text-brand cursor-pointer transition-colors"
-                            >
-                              {subItem.label}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Nova Construction → Card-style dropdown */}
-                {item.isCardMenu && openDropdown === item.title && (
-                  <div className="absolute top-full left-0 w-[400px] bg-white rounded-lg shadow-xl py-4 px-4 border border-gray-100 group-hover:block">
-                    {item.items.map((subItem) => (
-                      <div
-                        key={subItem.label}
-                        className="py-3 border-b last:border-0 hover:bg-amber-50 rounded-md px-2"
-                      >
-                        <a href={subItem.path}>
-                        <h4 className="font-semibold text-gray-800 mb-1">
-                          {subItem.label}
-                        </h4>
-                        </a>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          {subItem.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Normal Dropdowns */}
-                {item.isMegaMenu && openDropdown === item.title && (
-                  <div className="absolute top-full left-0 w-[400px] bg-white rounded-lg shadow-xl p-4 border border-gray-100">
-                    {item.groups?.map((group) => (
-                      <div key={group.title}>
-                        <h4 className="font-semibold text-gray-800 mb-1">
-                          {group.title}
-                        </h4>
-                        <ul className="space-y-1 text-sm text-gray-600">
-                          {group.items.map((subItem) => (
-                            <li key={subItem.label}>
-                              <a
-                                href={subItem.path}
+                  {/* Mega Menu (Nova Interiors only) */}
+                  {item.isMegaMenu && openDropdown === item.title && (
+                    <div className="absolute top-full left-0 w-[800px] bg-white rounded-lg shadow-xl py-6 px-6 border border-gray-100 grid grid-cols-2 gap-8">
+                      {item.groups.map((group) => (
+                        <div key={group.title}>
+                          <a href={group.items.find((e) => e.path)?.path}>
+                            <h4 className="font-semibold text-gray-800 mb-2">
+                              {group.title}
+                            </h4>
+                          </a>
+                          <ul className="space-y-1 text-sm text-gray-600">
+                            {group.items.map((subItem) => (
+                              <li
+                                key={subItem.label}
                                 className="hover:text-brand cursor-pointer transition-colors"
                               >
                                 {subItem.label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Nova Construction → Card-style dropdown */}
+                  {item.isCardMenu && openDropdown === item.title && (
+                    <div className="absolute top-full left-0 w-[400px] bg-white rounded-lg shadow-xl py-4 px-4 border border-gray-100 group-hover:block">
+                      {item.items.map((subItem) => (
+                        <div
+                          key={subItem.label}
+                          className="py-3 border-b last:border-0 hover:bg-amber-50 rounded-md px-2"
+                        >
+                          <a href={subItem.path}>
+                            <h4 className="font-semibold text-gray-800 mb-1">
+                              {subItem.label}
+                            </h4>
+                          </a>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {subItem.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Normal Dropdowns */}
+                  {item.isMegaMenu && openDropdown === item.title && (
+                    <div className="absolute top-full left-0 w-[400px] bg-white rounded-lg shadow-xl p-4 border border-gray-100">
+                      {item.groups?.map((group) => (
+                        <div key={group.title}>
+                          <h4 className="font-semibold text-gray-800 mb-1">
+                            {group.title}
+                          </h4>
+                          <ul className="space-y-1 text-sm text-gray-600">
+                            {group.items.map((subItem) => (
+                              <li key={subItem.label}>
+                                <a
+                                  href={subItem.path}
+                                  className="hover:text-brand cursor-pointer transition-colors"
+                                >
+                                  {subItem.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
+          </div>
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
             <a href="/contactUs">
-            <button className="hidden md:block px-6 py-2  text-brand border border-brand rounded hover:bg-brand hover:text-white transition-colors font-medium">
-              Get Free Estimate
-            </button>
+              <button className="hidden md:block px-6 py-2  text-brand border border-brand rounded hover:bg-brand hover:text-white transition-colors font-medium">
+                Get Free Estimate
+              </button>
             </a>
 
             {/* Mobile Menu Toggle */}
@@ -355,7 +363,7 @@ const productCategories = [
                   <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <User
                       onClick={() => {
-                        setEmailSignIn(true);
+                        navigate("/login");
                       }}
                       size={20}
                       className="text-gray-700"
@@ -421,7 +429,7 @@ const productCategories = [
               <User
                 size={20}
                 onClick={() => {
-                  setEmailSignIn(true);
+                  navigate("/login");
                 }}
                 className="text-gray-700"
               />
