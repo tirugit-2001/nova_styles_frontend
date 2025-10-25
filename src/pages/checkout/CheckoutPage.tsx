@@ -1,63 +1,144 @@
-import React, { useState } from 'react';
-// import { useCart } from '../../context/CartContext';
+import React, { useState, useEffect } from "react";
 
+import api from "../../service/api";
+import { useOrderStore } from "../../store";
 
-interface CheckoutPageProps {
-  cartItems?: any[];
+declare const Razorpay: any;
+
+interface Address {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+  isDefault?: boolean;
 }
 
-const CheckoutPage: React.FC<CheckoutPageProps> = () => {
-  // const { cartItems, clearCart } = useCart();
+const CheckoutPage: React.FC = () => {
+  const { items, totalAmount, clearOrder } = useOrderStore();
+
+  const [userAddresses, setUserAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null
+  );
 
   const [formData, setFormData] = useState({
-    email: '',
-    gstin: '',
-    country: '',
-    city: '',
-    state: '',
-    firstName: '',
-    lastName: '',
-    address: '',
-    pincode: '',
-    phoneNumber: ''
+    email: "",
+    gstin: "",
+    country: "",
+    city: "",
+    state: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    pincode: "",
+    phoneNumber: "",
   });
 
-  // 🔹 Update this to use cart from context
-  // const calculateSubtotal = () => {
-  //   // return cartItems.reduce(
-  //   //   (total:any, item:any) => total + (item.price ?? 0) * (item.quantity ?? 1),
-  //   //   0
-  //   // );
-  // };
-
-  // const calculateGST = () => calculateSubtotal() * 0.18;
-  // const calculateTotal = () => calculateSubtotal() + calculateGST();
+  // Fetch user addresses on mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const { data } = await api.get("/addresses");
+        setUserAddresses(data);
+        if (data.length > 0) {
+          setSelectedAddressId(data[0]._id);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchAddresses();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setSelectedAddressId(null);
   };
 
-  // const handleSubmit = () => {
-  //   console.log('Order submitted:', { formData, cartItems });
-  //   clearCart();
-  //   alert('Order placed successfully!');
-  // };
+  const handleSelectAddress = (id: string) => {
+    setSelectedAddressId(id);
+  };
+
+  const handleOrder = async () => {
+    if (!items.length) {
+      alert("No items to order!");
+      return;
+    }
+
+    try {
+      const payload = {
+        items,
+        address: selectedAddressId
+          ? { addressId: selectedAddressId }
+          : formData,
+        amount: totalAmount * 100,
+      };
+
+      const { data } = await api.post("/payments/orders/create-order", payload);
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        amount: data.amount,
+        currency: "INR",
+        name: "Your Store Name",
+        description: "Order Payment",
+        order_id: data.id,
+        handler: async (response: any) => {
+          try {
+            await api.post("/payments/orders/verify", {
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
+              orderItems: items,
+              address: selectedAddressId
+                ? { addressId: selectedAddressId }
+                : formData,
+              totalAmount,
+            });
+
+            alert("Payment successful!");
+            clearOrder();
+          } catch (err) {
+            console.error(err);
+            alert("Payment verification failed!");
+          }
+        },
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          contact: formData.phoneNumber,
+        },
+        theme: { color: "#F97316" },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create order. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] py-8 px-4 mt-48">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Side - Contact and Shipping Form */}
+          {/* Left Side */}
           <div className="space-y-6">
+            {/* Contact Info */}
             <div className="p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Contact information
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Latest dream home interiors delivered the hassle-free way
+                Latest dream home interiors delivered hassle-free
               </p>
-
               <div className="space-y-4">
                 <input
                   type="email"
@@ -84,9 +165,34 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                 Shipping address
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Latest dream home interiors delivered the hassle-free way
+                Select an address or enter new
               </p>
 
+              {/* Address List */}
+              {userAddresses.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {userAddresses.map((addr) => (
+                    <div
+                      key={addr._id}
+                      onClick={() => handleSelectAddress(addr._id)}
+                      className={`p-3 border rounded cursor-pointer ${
+                        selectedAddressId === addr._id
+                          ? "border-orange-500 bg-orange-50"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      <p>
+                        {addr.firstName} {addr.lastName}, {addr.street},{" "}
+                        {addr.city}, {addr.state}, {addr.postalCode},{" "}
+                        {addr.country}
+                      </p>
+                      <p>Phone: {addr.phone}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Manual Address */}
               <div className="space-y-4">
                 <input
                   type="text"
@@ -96,7 +202,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
-
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
@@ -115,7 +220,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                     className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
@@ -134,16 +238,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
                     className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
-
                 <input
                   type="text"
                   name="address"
-                  placeholder="Address"
+                  placeholder="Street Address"
                   value={formData.address}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
-
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
@@ -169,64 +271,66 @@ const CheckoutPage: React.FC<CheckoutPageProps> = () => {
           {/* Right Side - Order Summary */}
           <div className="lg:sticky lg:top-8 h-fit">
             <div className="p-6 shadow-sm">
-              {/* Total Section */}
               <div className="flex justify-between items-center mb-4 pb-4 border-b">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Total</h3>
-                  <p className="text-sm text-gray-600">
-                    {/* Including ₹ {calculateGST().toLocaleString()} GST @18% */}
-                  </p>
+                  <p className="text-sm text-gray-600">Including GST @18%</p>
                 </div>
                 <div className="text-2xl font-bold text-gray-900">
-                  {/* ₹ {calculateTotal().toLocaleString()} */}
+                  ₹ {totalAmount.toLocaleString()}
                 </div>
               </div>
 
-              {/* Order Summary */}
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Order summary
               </h3>
 
-              {/* {cartItems.length === 0 ? (
+              {items.length === 0 ? (
                 <p className="text-gray-600">Your cart is empty.</p>
               ) : (
                 <div className="space-y-6 mb-6">
-                  {cartItems.map((item:any, index:number) => (
-                    <div key={index} className="flex gap-4">
+                  {items.map((item, idx) => (
+                    <div key={idx} className="flex gap-4">
                       <div className="w-24 h-24 flex-shrink-0">
                         <img
-                          src={item.image}
+                          src={item?.image || ""}
                           alt={item.name}
                           className="w-full h-full object-cover rounded-md"
                         />
                       </div>
-
                       <div className="flex-1">
                         <div className="flex justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">{item.name}</h4>
+                          <h4 className="font-medium text-gray-900">
+                            {item.name}
+                          </h4>
                           <span className="font-semibold text-gray-900">
-                            ₹ {item.price?.toLocaleString()}
+                            ₹ {(item.price * item.quantity).toLocaleString()}
                           </span>
                         </div>
-
                         <div className="text-sm text-gray-600 space-y-1">
-                          <p>Quantity: {item.quantity ?? 1}</p>
+                          <p>Quantity: {item.quantity}</p>
+                          {item.area && <p>Area: {item.area} sq.ft</p>}
+                          {item.selectedColor && (
+                            <p>Color: {item.selectedColor}</p>
+                          )}
+                          {item.selectedTexture && (
+                            <p>Texture: {item.selectedTexture}</p>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              )} */}
+              )}
 
-              {/* Order Button */}
-              {/* {cartItems.length > 0 && (
+              {items.length > 0 && (
                 <button
-                  onClick={handleSubmit}
+                  onClick={handleOrder}
                   className="w-full py-4 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold text-lg"
                 >
-                  Order
+                  Place Order
                 </button>
-              )} */}
+              )}
             </div>
           </div>
         </div>

@@ -2,11 +2,13 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../service/api";
 import { toast } from "sonner";
+import { useUserStore } from "../../store";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, loading, error } = useUserStore();
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -27,28 +29,16 @@ const Login = () => {
       localStorage.setItem("deviceId", deviceId);
     }
     if (!formData.password || !formData.email) {
-      alert("All fields are required!");
+      toast.error("All fields are required!");
       return;
     }
-    try {
-      const { status } = await api.post("/auth/login", {
-        email: formData.email,
-        password: formData.password,
-        deviceId: deviceId,
-      });
-      if (status == 200) {
-        navigate("/", { replace: true });
-        toast.success("Login successful!", {
-          style: { color: "green" },
-        });
-      }
-    } catch (e) {
-      toast.error("Login failed. Please try again.", {
-        style: { color: "red" },
-      });
-      console.error("Login error:", e);
+    const result = await login(formData.email, formData.password, deviceId);
+    if (result) {
+      toast.success("Login successful!", { style: { color: "green" } });
+      navigate("/", { replace: true });
+    } else {
+      toast.error(error || "Login failed. Please try again.");
     }
-    console.log("Sign in:", formData);
   };
 
   return (
@@ -70,9 +60,9 @@ const Login = () => {
               <User size={32} className="text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              "Welcome Back"
+              Welcome Back
             </h2>
-            <p className="text-gray-600">"Sign in to your account"</p>
+            <p className="text-gray-600">Sign in to your account</p>
           </div>
 
           <div className="space-y-5">
@@ -92,6 +82,7 @@ const Login = () => {
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                   placeholder="you@example.com"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -112,6 +103,7 @@ const Login = () => {
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                   placeholder="••••••••"
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -126,14 +118,15 @@ const Login = () => {
             <button
               onClick={handleSubmit}
               className="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl"
+              disabled={loading}
             >
-              "Sign In"
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </div>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              "Already have an account?"
+              Don't have an account?
               <button className="ml-2 text-brand hover:text-brand-dark font-semibold">
                 <Link to="/register">Register</Link>
               </button>

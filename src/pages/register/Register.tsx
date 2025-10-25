@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../service/api";
+
 import { toast } from "sonner";
+import { useUserStore } from "../../store";
 
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const { register, loading, error } = useUserStore();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -28,27 +30,34 @@ const Register = () => {
       alert("Passwords do not match!");
       return;
     }
-    try {
-      const { status } = await api.post("/auth/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.phone
+    ) {
+      toast.warning("All fields are required!");
+      return;
+    }
+
+    const result = await register(
+      formData.name,
+      formData.phone,
+      formData.email,
+      formData.password
+    );
+    if (result) {
+      navigate("/login");
+      toast.success("Registration successful! Please log in.", {
+        style: { color: "green" },
       });
-      if (status == 201) {
-        navigate("/login");
-        toast.success("Registration successful! Please log in.", {
-          style: { color: "green" },
-        });
-      }
-    } catch (e: any) {
-      toast.error(e.response.data.message, {
+    } else {
+      toast.error(error || "Registration failed. Please try again.", {
         style: { color: "red" },
       });
-      console.error("Registration error:", e);
     }
-    console.log("Sign up:", formData);
   };
+  console.log("Sign up:", formData);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -185,11 +194,13 @@ const Register = () => {
                 </button>
               </div>
             </div>
+
             <button
               onClick={handleSubmit}
               className="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl"
+              disabled={loading}
             >
-              Sign Up
+              {loading ? "Signing Up..." : "Sign Up"}
             </button>
           </div>
 

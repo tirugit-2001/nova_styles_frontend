@@ -32,9 +32,7 @@ const useCartStore = create<CartState>((set, _) => ({
 
   loadCart: async (user) => {
     if (user?.token) {
-      const { data } = await api.get("/cart", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const { data } = await api.get("/cart");
       set({ items: data.cart.items, totalPrice: data.cart.totalPrice });
     } else {
       const local = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -48,15 +46,14 @@ const useCartStore = create<CartState>((set, _) => ({
 
   addToCart: async (product, user) => {
     if (user?.token) {
-      const { data } = await api.post(
-        "/cart",
-        { productId: product._id, quantity: 1 },
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
+      const { data } = await api.post("/cart", {
+        productId: product._id,
+        quantity: 1,
+      });
       set({ items: data.cart.items, totalPrice: data.cart.totalPrice });
     } else {
       let local = JSON.parse(localStorage.getItem("cart") || "[]");
-      const existing = local.find((i: any) => i.productId === product._id);
+      const existing = local.find((i: any) => i?.productId === product._id);
       if (existing) existing.quantity += 1;
       else local.push({ productId: product._id, quantity: 1, product });
       localStorage.setItem("cart", JSON.stringify(local));
@@ -70,11 +67,7 @@ const useCartStore = create<CartState>((set, _) => ({
 
   updateQuantity: async (productId, quantity, user) => {
     if (user?.token) {
-      const { data } = await api.put(
-        "/cart/update",
-        { productId, quantity },
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
+      const { data } = await api.put("/cart/update", { productId, quantity });
       set({ items: data.cart.items, totalPrice: data.cart.totalPrice });
     } else {
       let local = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -92,9 +85,7 @@ const useCartStore = create<CartState>((set, _) => ({
 
   removeItem: async (productId, user) => {
     if (user?.token) {
-      const { data } = await api.delete(`/cart/${productId}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const { data } = await api.delete(`/cart/${productId}`);
       set({ items: data.cart.items, totalPrice: data.cart.totalPrice });
     } else {
       let local = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -112,11 +103,7 @@ const useCartStore = create<CartState>((set, _) => ({
     const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!guestCart.length || !user?.token) return;
 
-    const { data } = await api.post(
-      "/cart/merge",
-      { guestCart },
-      { headers: { Authorization: `Bearer ${user.token}` } }
-    );
+    const { data } = await api.post("/cart/merge", { guestCart });
     localStorage.removeItem("cart");
     set({ items: data.cart.items, totalPrice: data.cart.totalPrice });
   },

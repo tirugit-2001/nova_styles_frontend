@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useOrderStore } from "../../store";
 import api from "../../service/api";
 
 const ProductDetail: React.FC = () => {
@@ -12,6 +13,7 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState<string>("0");
+  const { addItem } = useOrderStore();
 
   const { id } = useParams();
   console.log(id);
@@ -36,7 +38,6 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleOrder = () => {
-    // Handle order logic (cart/order API call)
     console.log("Order placed:", {
       productId: product._id,
       texture: selectedTexture,
@@ -44,6 +45,17 @@ const ProductDetail: React.FC = () => {
       area,
       quantity,
     });
+    addItem({
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      selectedColor,
+      selectedTexture,
+      area,
+      image: product.image,
+    });
+    navigate("/checkout");
   };
   const calculateTotalPrice = () => {
     if (area !== 0) {

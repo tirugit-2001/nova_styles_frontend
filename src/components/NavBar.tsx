@@ -13,12 +13,15 @@ import {
 import SignInForm from "../service/Email";
 import logo from "../../public/novalogo.png";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../store";
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { user } = useUserStore();
+  console.log(user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -357,18 +360,27 @@ const NavBar = () => {
             <div>
               {isScreenBelow700 && (
                 <>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <button
+                    onClick={() => {
+                      navigate("/cart");
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
                     <ShoppingCart size={20} className="text-gray-700" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <User
-                      onClick={() => {
-                        navigate("/login");
-                      }}
-                      size={20}
-                      className="text-gray-700"
-                    />
-                  </button>
+                  {!user ? (
+                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                      <User
+                        onClick={() => {
+                          navigate("/login");
+                        }}
+                        size={20}
+                        className="text-gray-700"
+                      />
+                    </button>
+                  ) : (
+                    <span className=" font-semibold"> {user?.username}</span>
+                  )}
                 </>
               )}
 
@@ -422,18 +434,27 @@ const NavBar = () => {
 
           {/* Fixed Buttons (always visible, never scroll) */}
           <div className="flex items-center gap-2 ml-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button
+              onClick={() => {
+                navigate("/cart");
+              }}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <ShoppingCart size={20} className="text-gray-700" />
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <User
-                size={20}
-                onClick={() => {
-                  navigate("/login");
-                }}
-                className="text-gray-700"
-              />
-            </button>
+            {!user ? (
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <User
+                  onClick={() => {
+                    navigate("/login");
+                  }}
+                  size={20}
+                  className="text-gray-700"
+                />
+              </button>
+            ) : (
+              <span className=" font-semibold"> {user?.username}</span>
+            )}
           </div>
         </div>
       </div>
