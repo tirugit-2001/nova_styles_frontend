@@ -8,6 +8,9 @@ import CheckoutPage from "../pages/checkout/CheckoutPage";
 import Protected from "../pages/protected/Protected";
 import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
+import Profile from "../pages/profile/Profile";
+import MyOrders from "../pages/profile/myorders/MyOrders";
+import Myaddress from "../pages/profile/myaddress/Myaddress";
 
 const MainRoutes = () => {
   return (
@@ -17,10 +20,14 @@ const MainRoutes = () => {
       <Route path="/" element={<Parent />}>
         <Route index element={<Home />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/cart " element={<Cart />} />
+        <Route path="/cart" element={<Cart />} />
         <Route element={<Protected />}>
           <Route path="/orders" element={<Orders />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/profile" element={<Profile />}>
+            <Route index element={<MyOrders />} />
+            <Route path="myaddress" element={<Myaddress />} />
+          </Route>
         </Route>
       </Route>
     </Routes>

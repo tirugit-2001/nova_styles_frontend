@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useOrderStore } from "../../store";
+import { useCartStore, useOrderStore } from "../../store";
+import { toast } from "sonner";
 import api from "../../service/api";
 
 const ProductDetail: React.FC = () => {
@@ -14,6 +15,7 @@ const ProductDetail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState<string>("0");
   const { addItem } = useOrderStore();
+  const { addToCart } = useCartStore();
 
   const { id } = useParams();
   console.log(id);
@@ -46,7 +48,7 @@ const ProductDetail: React.FC = () => {
       quantity,
     });
     addItem({
-      productId: product._id,
+      _id: product._id,
       name: product.name,
       price: product.price,
       quantity,
@@ -56,6 +58,26 @@ const ProductDetail: React.FC = () => {
       image: product.image,
     });
     navigate("/checkout");
+  };
+
+  const handleCart = () => {
+    console.log("produciuufid");
+    console.log(product);
+    addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      selectedColor,
+      selectedTexture,
+      area,
+      image: product.image,
+    });
+    toast.success("Item added to cart successfully", {
+      style: {
+        color: "green",
+      },
+    });
   };
   const calculateTotalPrice = () => {
     if (area !== 0) {
@@ -222,7 +244,7 @@ const ProductDetail: React.FC = () => {
 
               <button
                 className="flex-1 py-3 px-6 bg-white border border-brand text-brand hover:bg-orange-50 transition-colors font-medium rounded"
-                onClick={() => console.log("Added to cart")}
+                onClick={handleCart}
               >
                 Add to Cart
               </button>

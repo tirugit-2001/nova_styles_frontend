@@ -9,6 +9,11 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useUserStore();
 
+  // const { mergeCart, loadCart } = useCartStore((state: any) => ({
+  //   mergeCart: state.mergeCart,
+  //   loadCart: state.loadCart,
+  // }));
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -35,6 +40,7 @@ const Login = () => {
     const result = await login(formData.email, formData.password, deviceId);
     if (result) {
       toast.success("Login successful!", { style: { color: "green" } });
+
       navigate("/", { replace: true });
     } else {
       toast.error(error || "Login failed. Please try again.");

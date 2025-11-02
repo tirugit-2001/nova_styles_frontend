@@ -1,10 +1,12 @@
 import { create } from "zustand";
 import api from "../service/api";
-import { jwtDecode } from "jwt-decode";
+
+import useCartStore from "./useCartStore";
 
 interface User {
   username: string;
   email: string;
+  phone: number;
 }
 
 interface UserState {
@@ -25,7 +27,7 @@ interface UserState {
   setUser: (user: User) => void;
 }
 
-const useUserStore = create<UserState>((set) => ({
+const useAuthStore = create<UserState>((set) => ({
   user: null,
   isAuthenticated: false,
   loading: false,
@@ -63,36 +65,48 @@ const useUserStore = create<UserState>((set) => ({
 
   login: async (email, password, deviceId) => {
     set({ loading: true, error: null });
+
     try {
-      const { status, data } = await api.post("/auth/login", {
+      const { status } = await api.post("/auth/login", {
         email,
         password,
         deviceId,
       });
-      console.log(data);
 
       if (status === 200) {
-        const token = data.result.accessToken; //
-        const decoded: { username: string; email: string } = jwtDecode(token);
-        console.log("Decoded token:", decoded);
-        set({ user: decoded, isAuthenticated: true });
-        return true;
+        useAuthStore.getInitialState().checkAuth();
       }
     } catch (err: any) {
       set({
         error: err?.response?.data?.message || "Login failed",
         isAuthenticated: false,
       });
+      return false;
     } finally {
       set({ loading: false });
     }
+
+    try {
+      const cartStore = useCartStore.getState();
+      if (cartStore.items.length !== 0) {
+        await cartStore.mergeCart();
+      }
+      await cartStore.loadCart();
+    } catch (cartErr) {
+      console.error("Cart merging failed but login succeeded:", cartErr);
+    }
+
+    return true;
   },
+
   logout: async () => {
     set({ loading: true });
 
     try {
-      await api.post("/auth/logout");
-      set({ user: null, isAuthenticated: false });
+      const { status } = await api.post("/auth/logout");
+      if (status == 200) {
+        set({ user: null, isAuthenticated: false });
+      }
     } catch (err) {
       console.log("Logout error:", err);
     } finally {
@@ -103,7 +117,18 @@ const useUserStore = create<UserState>((set) => ({
   checkAuth: async () => {
     set({ loading: true });
     try {
-      const { data } = await api.get("/auth/me");
+      const { data } = await api.get("/auth/check-session");
+      set({ user: data.user_info, isAuthenticated: true });
+    } catch (err) {
+      set({ user: null, isAuthenticated: false });
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getAddress: async () => {
+    set({ loading: true });
+    try {
+      const { data } = await api.get("/auth/check-session");
       set({ user: data, isAuthenticated: true });
     } catch (err) {
       set({ user: null, isAuthenticated: false });
@@ -113,4 +138,4 @@ const useUserStore = create<UserState>((set) => ({
   },
 }));
 
-export default useUserStore;
+export default useAuthStore;

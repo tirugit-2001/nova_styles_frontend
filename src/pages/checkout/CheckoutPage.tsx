@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import api from "../../service/api";
 import { useOrderStore } from "../../store";
+import SummaryProductCard from "../../components/ui/SummaryProductCard";
+import Button from "../../components/ui/Button";
 
 declare const Razorpay: any;
 
@@ -20,7 +22,7 @@ interface Address {
 
 const CheckoutPage: React.FC = () => {
   const { items, totalAmount, clearOrder } = useOrderStore();
-
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [userAddresses, setUserAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null
@@ -34,17 +36,19 @@ const CheckoutPage: React.FC = () => {
     state: "",
     firstName: "",
     lastName: "",
-    address: "",
-    pincode: "",
-    phoneNumber: "",
+    street: "",
+    postalCode: "",
+    phone: "",
   });
 
   // Fetch user addresses on mount
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const { data } = await api.get("/addresses");
-        setUserAddresses(data);
+        const { data } = await api.get("/users/address");
+        console.log("datatat");
+        console.log(data);
+        setUserAddresses(data.address);
         if (data.length > 0) {
           setSelectedAddressId(data[0]._id);
         }
@@ -53,6 +57,18 @@ const CheckoutPage: React.FC = () => {
       }
     };
     fetchAddresses();
+  }, []);
+  console.log(items);
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +87,11 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
+    if (!razorpayLoaded) {
+      alert("Payment system is still loading. Please wait a moment.");
+      return;
+    }
+
     try {
       const payload = {
         items,
@@ -79,23 +100,30 @@ const CheckoutPage: React.FC = () => {
           : formData,
         amount: totalAmount * 100,
       };
+      console.log(items);
 
-      const { data } = await api.post("/payments/orders/create-order", payload);
-
+      const { data } = await api.post("/payments/create-order", payload);
+      console.log(data);
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY,
-        amount: data.amount,
+        amount: data.order.amount,
         currency: "INR",
         name: "Your Store Name",
         description: "Order Payment",
-        order_id: data.id,
+        order_id: data.order.id,
         handler: async (response: any) => {
           try {
-            await api.post("/payments/orders/verify", {
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpayOrderId: response.razorpay_order_id,
-              razorpaySignature: response.razorpay_signature,
-              orderItems: items,
+            const {
+              razorpay_payment_id,
+              razorpay_order_id,
+              razorpay_signature,
+            } = response;
+            await api.post("/payments/verify", {
+              razorpay_order_id,
+              razorpay_payment_id,
+              razorpay_signature,
+              paymentMethod: "cash",
+              items,
               address: selectedAddressId
                 ? { addressId: selectedAddressId }
                 : formData,
@@ -112,12 +140,19 @@ const CheckoutPage: React.FC = () => {
         prefill: {
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
-          contact: formData.phoneNumber,
+          contact: formData.phone,
         },
         theme: { color: "#F97316" },
       };
 
-      const rzp = new Razorpay(options);
+      const rzp = new window.Razorpay(options);
+
+      // Optional: Handle payment failures
+      rzp.on("payment.failed", function (response: any) {
+        console.error("Payment failed:", response.error);
+        alert("❌ Payment failed. Please try again.");
+      });
+
       rzp.open();
     } catch (err) {
       console.error(err);
@@ -240,26 +275,26 @@ const CheckoutPage: React.FC = () => {
                 </div>
                 <input
                   type="text"
-                  name="address"
+                  name="street"
                   placeholder="Street Address"
-                  value={formData.address}
+                  value={formData.street}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
-                    name="pincode"
-                    placeholder="Pincode"
-                    value={formData.pincode}
+                    name="postalCode"
+                    placeholder="postalCode"
+                    value={formData.postalCode}
                     onChange={handleInputChange}
                     className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                   <input
                     type="tel"
-                    name="phoneNumber"
+                    name="phone"
                     placeholder="Phone Number"
-                    value={formData.phoneNumber}
+                    value={formData.phone}
                     onChange={handleInputChange}
                     className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
@@ -289,47 +324,43 @@ const CheckoutPage: React.FC = () => {
                 <p className="text-gray-600">Your cart is empty.</p>
               ) : (
                 <div className="space-y-6 mb-6">
-                  {items.map((item, idx) => (
-                    <div key={idx} className="flex gap-4">
-                      <div className="w-24 h-24 flex-shrink-0">
-                        <img
-                          src={item?.image || ""}
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">
-                            {item.name}
-                          </h4>
-                          <span className="font-semibold text-gray-900">
-                            ₹ {(item.price * item.quantity).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-600 space-y-1">
-                          <p>Quantity: {item.quantity}</p>
-                          {item.area && <p>Area: {item.area} sq.ft</p>}
-                          {item.selectedColor && (
-                            <p>Color: {item.selectedColor}</p>
-                          )}
-                          {item.selectedTexture && (
-                            <p>Texture: {item.selectedTexture}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                  {items.map((item) => (
+                    // <div key={idx} className="flex gap-4">
+                    //   <div className="w-24 h-24 flex-shrink-0">
+                    //     <img
+                    //       src={item?.image || ""}
+                    //       alt={item.name}
+                    //       className="w-full h-full object-cover rounded-md"
+                    //     />
+                    //   </div>
+                    //   <div className="flex-1">
+                    //     <div className="flex justify-between mb-2">
+                    //       <h4 className="font-medium text-gray-900">
+                    //         {item.name}
+                    //       </h4>
+                    //       <span className="font-semibold text-gray-900">
+                    //         ₹ {(item.price * item.quantity).toLocaleString()}
+                    //       </span>
+                    //     </div>
+                    //     <div className="text-sm text-gray-600 space-y-1">
+                    //       <p>Quantity: {item.quantity}</p>
+                    //       {item.area && <p>Area: {item.area} sq.ft</p>}
+                    //       {item.selectedColor && (
+                    //         <p>Color: {item.selectedColor}</p>
+                    //       )}
+                    //       {item.selectedTexture && (
+                    //         <p>Texture: {item.selectedTexture}</p>
+                    //       )}
+                    //     </div>
+                    //   </div>
+                    // </div>
+                    <SummaryProductCard item={item} />
                   ))}
                 </div>
               )}
 
               {items.length > 0 && (
-                <button
-                  onClick={handleOrder}
-                  className="w-full py-4 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold text-lg"
-                >
-                  Place Order
-                </button>
+                <Button btnTitle={"Place Order"} handleClick={handleOrder} />
               )}
             </div>
           </div>

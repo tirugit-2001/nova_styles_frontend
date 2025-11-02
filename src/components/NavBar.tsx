@@ -13,7 +13,7 @@ import {
 import SignInForm from "../service/Email";
 import logo from "../../public/novalogo.png";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../store";
+import { useCartStore, useUserStore } from "../store";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -21,6 +21,9 @@ const NavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { user } = useUserStore();
+  console.log(user);
+  console.log("user");
+  const { items } = useCartStore();
   console.log(user);
 
   useEffect(() => {
@@ -360,14 +363,6 @@ const NavBar = () => {
             <div>
               {isScreenBelow700 && (
                 <>
-                  <button
-                    onClick={() => {
-                      navigate("/cart");
-                    }}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <ShoppingCart size={20} className="text-gray-700" />
-                  </button>
                   {!user ? (
                     <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                       <User
@@ -379,8 +374,17 @@ const NavBar = () => {
                       />
                     </button>
                   ) : (
-                    <span className=" font-semibold"> {user?.username}</span>
+                    <span className=" font-semibold"> {user.username}</span>
                   )}
+
+                  <button
+                    onClick={() => {
+                      navigate("/cart");
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <ShoppingCart size={20} className="text-gray-700" />
+                  </button>
                 </>
               )}
 
@@ -434,14 +438,6 @@ const NavBar = () => {
 
           {/* Fixed Buttons (always visible, never scroll) */}
           <div className="flex items-center gap-2 ml-4">
-            <button
-              onClick={() => {
-                navigate("/cart");
-              }}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ShoppingCart size={20} className="text-gray-700" />
-            </button>
             {!user ? (
               <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <User
@@ -453,8 +449,32 @@ const NavBar = () => {
                 />
               </button>
             ) : (
-              <span className=" font-semibold"> {user?.username}</span>
+              <div
+                onClick={() => {
+                  navigate("/profile");
+                }}
+                className="flex gap-2 cursor-pointer"
+              >
+                <User size={20} className="text-gray-700" />
+                <span className=" font-semibold"> {user?.username}</span>
+              </div>
             )}
+
+            <button
+              onClick={() => {
+                navigate("/cart");
+              }}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <div className="relative ">
+                {items?.length > 0 && (
+                  <div className="h-5 w-5 absolute right-3 top-[-12px] text-sm bg-brand text-white rounded-full">
+                    {items.length}
+                  </div>
+                )}
+                <ShoppingCart size={20} className="text-gray-700" />
+              </div>
+            </button>
           </div>
         </div>
       </div>
