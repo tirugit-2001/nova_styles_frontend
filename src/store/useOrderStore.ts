@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { OrderStore, ProductCardItem } from "../types";
-import api from "../service/api";
+import type { OrderState, ProductCardItem } from "../types";
 
-const useOrderStore = create<OrderStore>()(
+const useOrderStore = create<OrderState>()(
   persist(
     (set, _) => ({
       items: [],
@@ -23,16 +22,6 @@ const useOrderStore = create<OrderStore>()(
           0
         );
         set({ items, totalAmount });
-      },
-
-      myOrders: [],
-      getMyOrders: async () => {
-        try {
-          const res = await api.get("/orders/my");
-          set({ myOrders: res.data.orders });
-        } catch (error) {
-          console.error("Failed to fetch orders:", error);
-        }
       },
 
       clearOrder: () => set({ items: [], totalAmount: 0 }),

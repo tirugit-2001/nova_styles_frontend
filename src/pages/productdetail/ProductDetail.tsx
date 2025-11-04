@@ -131,7 +131,7 @@ const ProductDetail: React.FC = () => {
           <div className="flex items-center justify-center bg-white rounded shadow-sm p-4">
             <img
               src={
-                product?.image ||
+                product?.imageUrl ||
                 "https://via.placeholder.com/500x500?text=No+Image"
               }
               alt={product?.name}

@@ -5,18 +5,21 @@ import ProductDetail from "../pages/productdetail/ProductDetail";
 import Cart from "../pages/cart/Cart";
 import Orders from "../pages/orders/Orders";
 import CheckoutPage from "../pages/checkout/CheckoutPage";
-import Protected from "../pages/protected/Protected";
+import Protected from "../components/layouts/protected/Protected";
 import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
 import Profile from "../pages/profile/Profile";
 import MyOrders from "../pages/profile/myorders/MyOrders";
 import Myaddress from "../pages/profile/myaddress/Myaddress";
+import Public from "../components/layouts/public/Public";
 
 const MainRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<Public />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
       <Route path="/" element={<Parent />}>
         <Route index element={<Home />} />
         <Route path="/product/:id" element={<ProductDetail />} />

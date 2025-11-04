@@ -88,6 +88,8 @@ const useAuthStore = create<UserState>((set) => ({
 
     try {
       const cartStore = useCartStore.getState();
+      console.log("cartStore");
+      console.log(cartStore);
       if (cartStore.items.length !== 0) {
         await cartStore.mergeCart();
       }

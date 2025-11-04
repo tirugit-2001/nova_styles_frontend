@@ -15,12 +15,15 @@ interface Address {
 
 interface UserState {
   userAddresses: Address[];
+  userOrders: any[];
   loading: boolean;
   error: string | null;
   getAddresses: () => Promise<void>;
+  getOrders: () => Promise<void>;
 }
 
 const useUserStore = create<UserState>((set) => ({
+  userOrders: [],
   userAddresses: [],
   loading: false,
   error: null,
@@ -40,6 +43,14 @@ const useUserStore = create<UserState>((set) => ({
       });
     } finally {
       set({ loading: false });
+    }
+  },
+  getOrders: async () => {
+    try {
+      const res = await api.get("users/orders");
+      set({ userOrders: res.data.orders });
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
     }
   },
 }));

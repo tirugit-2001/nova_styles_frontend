@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useUserStore from "../../../store/useUserStoree";
+import useUserStore from "../../../store/useUserStore";
 
 const MyAddress = () => {
   const { userAddresses, loading, error, getAddresses } = useUserStore();
@@ -20,17 +20,17 @@ const MyAddress = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className=" w-[100%] h-full flex  ">
-      <div className="mt-[150px] flex flex-col   flex-1">
-        <h1 className="text-xl font-semibold ">My Addresses</h1>
+    <div className=" mt-[110px]  w-[100%] h-full flex  ">
+      <div className="flex flex-col px-2   flex-1">
+        <h1 className="text-xl font-semibold mb-4">My Addresses</h1>
 
-        {userAddresses.length > 0 ? (
-          <div className="space-y-2 flex-1  border-2 mb-4">
+        {userAddresses?.length > 0 ? (
+          <div className="space-y-2 flex-1  ">
             {userAddresses.map((addr: any) => (
               <div
                 key={addr._id}
                 onClick={() => handleSelectAddress(addr._id)}
-                className={`p-3 border rounded cursor-pointer ${
+                className={`p-3  rounded cursor-pointer ${
                   selectedAddressId === addr._id
                     ? "border-orange-500 bg-orange-50"
                     : "border-gray-300"

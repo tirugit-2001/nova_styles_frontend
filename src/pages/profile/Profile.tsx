@@ -3,8 +3,10 @@ import { useLocation } from "react-router-dom";
 
 import { Package, MapPin, LogOut } from "lucide-react";
 import useAuthStore from "../../store/useAuthStore";
+import { useCartStore } from "../../store";
 const Profile = () => {
   const { logout } = useAuthStore();
+  const { clearCart } = useCartStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   console.log(pathname);
@@ -22,13 +24,15 @@ const Profile = () => {
   ];
   const handleLogout = async () => {
     await logout();
+    clearCart();
+
     navigate("/");
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen border-2 border-r-emerald-500 bg-gray-50">
       {/* Sidebar */}
-      <div className="  flex-1 bg-white border-r mt-[160px] p-6">
+      <div className="  flex-1 bg-white  p-6 pt-[115px]">
         {/* User Profile */}
         <div className="flex flex-col items-center ">
           <div className="w-24 h-24 bg-gray-300 rounded-lg mb-3 flex items-center justify-center">
@@ -65,7 +69,7 @@ const Profile = () => {
       </div>
 
       {/* Main Content */}
-      <div className=" flex-[5]  p-8">
+      <div className=" flex-[5]  ">
         <Outlet />
       </div>
     </div>
