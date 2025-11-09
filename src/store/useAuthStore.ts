@@ -30,7 +30,8 @@ interface UserState {
 const useAuthStore = create<UserState>((set) => ({
   user: null,
   isAuthenticated: false,
-  loading: false,
+
+  loading: true,
   isRegistered: false,
   error: null,
   setUser: (user) => set({ user, isAuthenticated: true }),
@@ -63,6 +64,43 @@ const useAuthStore = create<UserState>((set) => ({
     }
   },
 
+  // login: async (email, password, deviceId) => {
+  //   set({ loading: true, error: null });
+
+  //   try {
+  //     const { status } = await api.post("/auth/login", {
+  //       email,
+  //       password,
+  //       deviceId,
+  //     });
+
+  //     if (status === 200) {
+  //       useAuthStore.getState().checkAuth();
+  //     }
+  //   } catch (err: any) {
+  //     set({
+  //       error: err?.response?.data?.message || "Login failed",
+  //       isAuthenticated: false,
+  //     });
+  //     return false;
+  //   } finally {
+  //     set({ loading: false });
+  //   }
+
+  //   try {
+  //     const cartStore = useCartStore.getState();
+  //     console.log("cartStore");
+  //     console.log(cartStore);
+  //     if (cartStore.items.length !== 0) {
+  //       await cartStore.mergeCart();
+  //     }
+  //     await cartStore.loadCart();
+  //   } catch (cartErr) {
+  //     console.error("Cart merging failed but login succeeded:", cartErr);
+  //   }
+
+  //   return true;
+  // },
   login: async (email, password, deviceId) => {
     set({ loading: true, error: null });
 
@@ -74,33 +112,33 @@ const useAuthStore = create<UserState>((set) => ({
       });
 
       if (status === 200) {
-        useAuthStore.getInitialState().checkAuth();
+        await useAuthStore.getState().checkAuth();
+
+        // Cart operations after successful login
+        try {
+          const cartStore = useCartStore.getState();
+          console.log("cartStore", cartStore);
+
+          if (cartStore.items.length !== 0) {
+            await cartStore.mergeCart();
+          }
+          await cartStore.loadCart();
+        } catch (cartErr) {
+          console.error("Cart merging failed but login succeeded:", cartErr);
+        }
+
+        set({ loading: false });
+        return true;
       }
     } catch (err: any) {
       set({
         error: err?.response?.data?.message || "Login failed",
         isAuthenticated: false,
+        loading: false,
       });
       return false;
-    } finally {
-      set({ loading: false });
     }
-
-    try {
-      const cartStore = useCartStore.getState();
-      console.log("cartStore");
-      console.log(cartStore);
-      if (cartStore.items.length !== 0) {
-        await cartStore.mergeCart();
-      }
-      await cartStore.loadCart();
-    } catch (cartErr) {
-      console.error("Cart merging failed but login succeeded:", cartErr);
-    }
-
-    return true;
   },
-
   logout: async () => {
     set({ loading: true });
 
@@ -119,8 +157,10 @@ const useAuthStore = create<UserState>((set) => ({
   checkAuth: async () => {
     set({ loading: true });
     try {
-      const { data } = await api.get("/auth/check-session");
-      set({ user: data.user_info, isAuthenticated: true });
+      const { data, status } = await api.get("/auth/check-session");
+      if (status == 200) {
+        set({ user: data.user_info, isAuthenticated: true });
+      }
     } catch (err) {
       set({ user: null, isAuthenticated: false });
     } finally {

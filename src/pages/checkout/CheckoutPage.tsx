@@ -4,6 +4,7 @@ import api from "../../service/api";
 import { useOrderStore } from "../../store";
 import SummaryProductCard from "../../components/ui/SummaryProductCard";
 import Button from "../../components/ui/Button";
+import { useNavigate } from "react-router-dom";
 
 declare const Razorpay: any;
 
@@ -24,6 +25,7 @@ const CheckoutPage: React.FC = () => {
   const { items, totalAmount, clearOrder } = useOrderStore();
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [userAddresses, setUserAddresses] = useState<Address[]>([]);
+  const navigate = useNavigate();
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null
   );
@@ -108,7 +110,7 @@ const CheckoutPage: React.FC = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY,
         amount: data.order.amount,
         currency: "INR",
-        name: "Your Store Name",
+        name: "Nova Styles Interior",
         description: "Order Payment",
         order_id: data.order.id,
         handler: async (response: any) => {
@@ -122,7 +124,7 @@ const CheckoutPage: React.FC = () => {
               razorpay_order_id,
               razorpay_payment_id,
               razorpay_signature,
-              paymentMethod: "cash",
+              paymentMethod: "Online",
               items,
               address: selectedAddressId
                 ? { addressId: selectedAddressId }
@@ -132,6 +134,7 @@ const CheckoutPage: React.FC = () => {
 
             alert("Payment successful!");
             clearOrder();
+            navigate("/profile");
           } catch (err) {
             console.error(err);
             alert("Payment verification failed!");

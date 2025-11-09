@@ -18,6 +18,7 @@ const MyAddress = () => {
 
   if (loading) return <p>Loading addresses...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
+  console.log(userAddresses);
 
   return (
     <div className=" mt-[110px]  w-[100%] h-full flex  ">
@@ -30,9 +31,9 @@ const MyAddress = () => {
               <div
                 key={addr._id}
                 onClick={() => handleSelectAddress(addr._id)}
-                className={`p-3  rounded cursor-pointer ${
+                className={`p-3 border-2 border-brand-dark  rounded cursor-pointer ${
                   selectedAddressId === addr._id
-                    ? "border-orange-500 bg-orange-50"
+                    ? " bg-orange-50"
                     : "border-gray-300"
                 }`}
               >

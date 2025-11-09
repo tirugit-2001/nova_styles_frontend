@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCartStore, useOrderStore } from "../../store";
 import { toast } from "sonner";
@@ -13,7 +13,13 @@ const ProductDetail: React.FC = () => {
   const [showDetails, setShowDetails] = useState<boolean>(true);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<string>("0");
+
+  const [actionLoading, setActionLoading] = useState<{
+    cart: boolean;
+    order: boolean;
+  }>({ cart: false, order: false });
   const { addItem } = useOrderStore();
   const { addToCart } = useCartStore();
 
@@ -24,6 +30,7 @@ const ProductDetail: React.FC = () => {
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
+      setError(null);
       const { data } = await api.get(`/product/${id}`);
       console.log(data);
       if (data) {
@@ -32,8 +39,14 @@ const ProductDetail: React.FC = () => {
         setSelectedTexture(data?.paperTextures?.[0] || "");
         setSelectedColor(data?.colours?.[0] || "");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || "Failed to load product details";
+      setError(errorMessage);
+      console.error("Fetch product error:", error);
+      toast.error(errorMessage, {
+        style: { color: "red" },
+      });
     } finally {
       setLoading(false);
     }
@@ -47,6 +60,7 @@ const ProductDetail: React.FC = () => {
       area,
       quantity,
     });
+    setActionLoading({ ...actionLoading, order: true });
     addItem({
       _id: product._id,
       name: product.name,
@@ -57,27 +71,39 @@ const ProductDetail: React.FC = () => {
       area,
       image: product.image,
     });
+    setActionLoading({ ...actionLoading, order: false });
     navigate("/checkout");
   };
 
-  const handleCart = () => {
+  const handleCart = async () => {
     console.log("produciuufid");
     console.log(product);
-    addToCart({
-      _id: product._id,
-      name: product.name,
-      price: product.price,
-      quantity,
-      selectedColor,
-      selectedTexture,
-      area,
-      image: product.image,
-    });
-    toast.success("Item added to cart successfully", {
-      style: {
-        color: "green",
-      },
-    });
+    try {
+      setActionLoading({ ...actionLoading, cart: true });
+
+      await addToCart({
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        selectedColor,
+        selectedTexture,
+        area,
+        image: product.image,
+      });
+      toast.success("Item added to cart successfully", {
+        style: {
+          color: "green",
+        },
+      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Something went wrong";
+      toast.error(msg, {
+        style: { color: "red" },
+      });
+    } finally {
+      setActionLoading({ ...actionLoading, cart: false });
+    }
   };
   const calculateTotalPrice = () => {
     if (area !== 0) {
@@ -96,12 +122,62 @@ const ProductDetail: React.FC = () => {
     calculateTotalPrice();
   }, [area, quantity]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        Loading product details...
+      <div className="min-h-screen flex flex-col items-center justify-center text-gray-600">
+        <Loader2 className="w-12 h-12 animate-spin text-brand mb-4" />
+        <p className="text-lg">Loading product details...</p>
       </div>
     );
+  }
+  if (error && !product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            Oops! Something went wrong
+          </h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={fetchProductDetails}
+              className="px-6 py-2 bg-brand text-white rounded hover:bg-brand-dark transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (!product && !loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center">
+          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            Product Not Found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            The product you're looking for doesn't exist or has been removed.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 bg-brand text-white rounded hover:bg-brand-dark transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 mt-32">
@@ -131,7 +207,7 @@ const ProductDetail: React.FC = () => {
           <div className="flex items-center justify-center bg-white rounded shadow-sm p-4">
             <img
               src={
-                product?.imageUrl ||
+                product?.image ||
                 "https://via.placeholder.com/500x500?text=No+Image"
               }
               alt={product?.name}
@@ -207,6 +283,7 @@ const ProductDetail: React.FC = () => {
                 <input
                   type="number"
                   value={area}
+                  disabled={actionLoading.cart || actionLoading.order}
                   onChange={(e) =>
                     setArea(e.target.value ? Number(e.target.value) : 0)
                   }
@@ -221,40 +298,64 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Quantity Selector & Buttons */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2">
+            {quantity == 0 ? (
+              <div>
+                <h2 className="text-xl font-semibold">Out of Stock</h2>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={actionLoading.cart || actionLoading.order}
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                  >
+                    −
+                  </button>
+                  <span className="text-lg font-medium text-gray-900 min-w-[30px] text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    disabled={actionLoading.cart || actionLoading.order}
+                    onClick={() =>
+                      setQuantity(Math.min(product?.stock, quantity + 1))
+                    }
+                    className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                  >
+                    +
+                  </button>
+                </div>
+
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                  className="flex-1 py-3 px-6 bg-white border border-brand text-brand hover:bg-orange-50 transition-colors font-medium rounded"
+                  onClick={handleCart}
+                  disabled={actionLoading.cart || actionLoading.order}
                 >
-                  −
+                  {actionLoading.cart ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    "Add to Cart"
+                  )}
                 </button>
-                <span className="text-lg font-medium text-gray-900 min-w-[30px] text-center">
-                  {quantity}
-                </span>
                 <button
-                  onClick={() =>
-                    setQuantity(Math.min(product?.stock, quantity + 1))
-                  }
-                  className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                  disabled={actionLoading.cart || actionLoading.order}
+                  onClick={handleOrder}
+                  className="flex-1 py-3 px-6 bg-brand text-white hover:bg-brand-dark transition-colors font-medium rounded"
                 >
-                  +
+                  {actionLoading.order ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Order"
+                  )}
                 </button>
               </div>
-
-              <button
-                className="flex-1 py-3 px-6 bg-white border border-brand text-brand hover:bg-orange-50 transition-colors font-medium rounded"
-                onClick={handleCart}
-              >
-                Add to Cart
-              </button>
-              <button
-                onClick={handleOrder}
-                className="flex-1 py-3 px-6 bg-brand text-white hover:bg-brand-dark transition-colors font-medium rounded"
-              >
-                Order
-              </button>
-            </div>
+            )}
 
             {/* Product Details Accordion */}
             <div className="border-t border-gray-200 pt-4">

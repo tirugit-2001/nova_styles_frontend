@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { removeCartItem } = useCartStore();
   const { items, totalPrice } = useCartStore();
 
   const { setItems } = useOrderStore();
@@ -20,18 +21,27 @@ const Cart = () => {
     }
     navigate("/checkout");
   };
+  const handleItemRemove = (productId: string) => {
+    removeCartItem(productId);
+  };
   return (
     <>
-      {items.length > 0 ? (
-        <div className="flex flex-col md:flex-row py-[182px] px-5 gap-5  min-h-screen">
-          <div className="flex-1">
+      {items?.length > 0 ? (
+        <div className="flex flex-col md:flex-row py-[182px] px-5 gap-8  min-h-screen">
+          <div className="flex-1 ">
             <h3 className="font-semibold">Order Summary</h3>
             <div className="flex my-4  flex-col gap-4">
               {items?.map((item: any) => (
-                <SummaryProductCard
-                  item={item.product}
-                  quantity={item.quantity}
-                />
+                <div>
+                  <SummaryProductCard
+                    component="cart"
+                    handleRemove={() => {
+                      handleItemRemove(item?.productId);
+                    }}
+                    item={item?.product}
+                    quantity={item?.quantity}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -41,7 +51,10 @@ const Cart = () => {
                 <p className="text-lg font-medium">Total</p>
                 <p className="text-gray-600 text-sm">Including </p>
               </div>
-              <h4 className="font-semibold text-gray-900"> ₹ {totalPrice}</h4>
+              <h4 className="font-semibold text-gray-900">
+                {" "}
+                ₹ {totalPrice?.toLocaleString()}
+              </h4>
             </div>
             <Button btnTitle="Order" handleClick={handleOrder} />
           </div>

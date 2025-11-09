@@ -14,21 +14,23 @@ const MyOrders = () => {
         <h1 className="text-xl font-semibold mb-4 ">My Orders</h1>
 
         {userOrders?.length > 0 ? (
-          userOrders.map((order) => (
-            <div key={order._id} className="border p-3 rounded-lg">
-              <h2 className="font-medium mb-2">Order #{order._id}</h2>
-              {order.items.map((item: any, index: number) => (
-                <SummaryProductCard
-                  key={index}
-                  item={item}
-                  quantity={item.quantity}
-                />
-              ))}
-              <p className="mt-2 font-semibold">
-                Total: ₹{order.totalAmount.toFixed(2)}
-              </p>
-            </div>
-          ))
+          <div className="flex flex-col gap-4">
+            {userOrders.map((order) => (
+              <div key={order._id} className="border p-3 rounded-lg">
+                <h2 className="font-medium mb-2">Order #{order._id}</h2>
+                {order.items.map((item: any, index: number) => (
+                  <SummaryProductCard
+                    key={index}
+                    item={item}
+                    quantity={item.quantity}
+                  />
+                ))}
+                <p className="mt-2 font-semibold">
+                  Total: ₹{order.totalAmount.toFixed(2)}
+                </p>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <h1 className=" text-black font-semibold text-3xl">

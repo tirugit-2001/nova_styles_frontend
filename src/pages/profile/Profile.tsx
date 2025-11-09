@@ -50,7 +50,7 @@ const Profile = () => {
               key={ind}
               to={item.path}
               className={`{w-full flex items-center gap-3 px-4 py-3 text-gray-900 bg-gray-100 rounded-lg ${
-                pathname === item.path && "bg-orange-200 text-white"
+                pathname === item.path && "bg-brand-dark text-white"
               }`}
             >
               {item.icon}

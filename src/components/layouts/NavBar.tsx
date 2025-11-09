@@ -9,7 +9,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-import logo from "../../../public/logo_N.png";
+import logo from "../../../public/novalogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useCartStore, useUserStore } from "../../store";
 import SignInForm from "../../service/Email";
