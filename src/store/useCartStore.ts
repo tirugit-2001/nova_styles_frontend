@@ -182,7 +182,7 @@ const useCartStore = create<CartState>()(
             const { data } = await api.delete(`/cart/${productId}`);
             set({
               items: data.cart.items,
-              totalPrice: data.totalPrice,
+              totalPrice: data.cart.totalPrice,
               loading: false,
             });
           } else {
