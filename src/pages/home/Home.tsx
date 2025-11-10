@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChevronRight, ShoppingCart } from "lucide-react";
+// import { ChevronRight, ShoppingCart } from "lucide-react";
 import sortBy from "../../../public/sort_by.png";
 import { useNavigate } from "react-router-dom";
 import api from "../../service/api";
@@ -12,7 +12,7 @@ import ProductCard from "../../components/ui/ProductCard";
 // }
 
 const Home: React.FC = () => {
-  const { addToCart, items, removeCartItem } = useCartStore();
+  const { items } = useCartStore();
   const [product, setProducts] = useState([]);
 
   const navigate = useNavigate();
