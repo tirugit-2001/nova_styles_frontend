@@ -1,7 +1,9 @@
 import React from "react";
 import { Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
-import logoN from "../../../public/logo_N.png";
-import logo from "../../../public/whitelogo.png";
+
+// import logo from "../../../public/novastyleslogo.svg";
+import logo from "../../../public/novastyleslogo.svg";
+import { Link } from "react-router-dom";
 
 interface FooterProps {
   companyName?: string;
@@ -14,11 +16,10 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({
   // companyName = "NovaStyles Constructions",
-  tagline = "Your Complete Interior & Construction Partner",
-  address = "Kozhikode, Kerala - 673001",
-  phone = "+91-XXXXX-XXXXX",
-  email = "info@novastyles.com",
-  website = "www.novastyles.com",
+
+  phone = "+91-9900334035",
+  email = "salesnovastyles@gmail.com",
+  website = "www.novastylesinterior.com",
 }) => {
   const services = [
     "Interior Design",
@@ -29,20 +30,18 @@ const Footer: React.FC<FooterProps> = ({
   ];
 
   const company = [
-    "About Us",
-    "Our Portfolio",
-    "Client Reviews",
-    "Blog & Tips",
-    "Career Opportunities",
+    { label: "About Us", path: "https://novastylesinterior.com/portfolio" },
+    {
+      label: "Our Portfolio",
+      path: "https://novastylesinterior.com/portfolio",
+    },
+    {
+      label: "Client Reviews",
+      path: "https://novastylesinterior.com/portfolio",
+    },
   ];
 
-  const locations = [
-    "Kozhikode (Calicut)",
-    "Wayanad",
-    "Thrissur",
-    "Ernakulam",
-    "Palakkad",
-  ];
+  const locations = ["Bangalore", "Hubli", "Dharwad"];
 
   return (
     <footer
@@ -58,45 +57,33 @@ const Footer: React.FC<FooterProps> = ({
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <a href="/">
                   <div className="flex gap-2">
-                    <img src={logoN} alt="#" className="text-white" />
-                    <img src={logo} alt="" />
+                    <img src={logo} alt="#" className="text-white" />
                   </div>
                 </a>
               </div>
-              <p className="text-sm font-light">{tagline}</p>
-              <p className="text-sm font-light">{address}</p>
-            </div>
-
-            {/* CTA Section */}
-            <div className="flex flex-col sm:flex-row justify-start lg:justify-end gap-4 sm:gap-10 lg:col-span-2 items-start sm:items-center">
-              <div className="text-start">
-                <h3 className="text-base sm:text-lg font-medium mb-2">
-                  Free home interior guide
-                </h3>
-                <p className="text-xs font-normal mb-4">
-                  Don't forget to consider these fundamental design guidelines
-                  to know before you start interior designing!
-                </p>
-              </div>
-              <button
-                className="border-2 px-8 py-2 text-sm font-normal hover:bg-white hover:text-gray-900 transition-colors duration-200 w-fit h-fit"
-                style={{ borderColor: "#C9A66B", color: "#C9A66B" }}
-              >
-                Download
-              </button>
+              <p className="text-sm font-light">
+                NovaStyles | Home Interiors, Construction & Premium Interior
+                Products
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
+      <div className="max-w-7xl   mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5  gap-6 sm:gap-8">
           {/* Contact Info */}
-          <div className="space-y-2 col-span-2 sm:col-span-1">
-            <p className="text-sm break-words">Phone: {phone}</p>
-            <p className="text-sm break-words">Email: {email}</p>
-            <p className="text-sm break-words">Website: {website}</p>
+          <div className="space-y-2 sm:col-span-1">
+            <p className="text-sm">
+              <span className="whitespace-nowrap">Phone:&nbsp;{phone}</span>
+            </p>
+            <p className="text-sm">
+              <span className="whitespace-nowrap">Email:&nbsp;{email}</span>
+            </p>
+            <p className="text-sm">
+              <span className="whitespace-nowrap">Website:&nbsp;{website}</span>
+            </p>
           </div>
 
           {/* Services */}
@@ -123,10 +110,11 @@ const Footer: React.FC<FooterProps> = ({
               {company.map((item, index) => (
                 <li key={index}>
                   <a
-                    href="#"
+                    href={item.path}
+                    target="_blank"
                     className="text-sm font-light hover:text-gray-300 transition-colors"
                   >
-                    {item}
+                    {item.label}
                   </a>
                 </li>
               ))}
@@ -135,8 +123,8 @@ const Footer: React.FC<FooterProps> = ({
 
           {/* Locations */}
           <div>
-            <h4 className="text-base font-normal mb-3 sm:mb-4">
-              Connect With us
+            <h4 className="text-base  font-normal mb-3 sm:mb-4">
+              Connect With Us
             </h4>
             <ul className="space-y-2">
               {locations.map((location, index) => (
@@ -155,7 +143,7 @@ const Footer: React.FC<FooterProps> = ({
           {/* Social Media */}
           <div>
             <h4 className="text-base font-normal mb-3 sm:mb-4">
-              Connect With US:
+              Connect With Us:
             </h4>
             <div className="flex gap-4">
               <a href="#" className="hover:opacity-70 transition-opacity">
@@ -180,21 +168,21 @@ const Footer: React.FC<FooterProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-6">
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 sm:gap-4 text-xs sm:text-sm font-light text-center">
             <p className="break-words">
-              © Novastyleconstructionand interirworks PrivateLimited
+              © Novastyles Construction And Interiorworks Private Limited
             </p>
             <div className="flex gap-4 sm:gap-8">
-              <a
-                href="#"
+              <Link
+                to="/privacy"
                 className="hover:text-gray-300 transition-colors whitespace-nowrap"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/terms"
                 className="hover:text-gray-300 transition-colors whitespace-nowrap"
               >
                 Terms and Condition
-              </a>
+              </Link>
             </div>
           </div>
         </div>

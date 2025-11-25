@@ -12,6 +12,8 @@ import Profile from "../pages/profile/Profile";
 import MyOrders from "../pages/profile/myorders/MyOrders";
 import Myaddress from "../pages/profile/myaddress/Myaddress";
 import Public from "../components/layouts/public/Public";
+import PrivacyPolicy from "../pages/privacy/PrivacyPolicy";
+import TermsAndConditions from "../pages/terms/TermsAndCondition";
 
 const MainRoutes = () => {
   return (
@@ -33,6 +35,8 @@ const MainRoutes = () => {
           </Route>
         </Route>
       </Route>
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
     </Routes>
   );
 };

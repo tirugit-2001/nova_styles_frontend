@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 import api from "../../service/api";
-import { useOrderStore } from "../../store";
+import { useCartStore, useOrderStore } from "../../store";
 import SummaryProductCard from "../../components/ui/SummaryProductCard";
 import Button from "../../components/ui/Button";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 declare const Razorpay: any;
 
@@ -22,7 +23,8 @@ interface Address {
 }
 
 const CheckoutPage: React.FC = () => {
-  const { items, totalAmount, clearOrder } = useOrderStore();
+  const { items, totalAmount, clearOrder, cartFlag } = useOrderStore();
+  const { loadCart } = useCartStore();
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [userAddresses, setUserAddresses] = useState<Address[]>([]);
   const navigate = useNavigate();
@@ -82,13 +84,33 @@ const CheckoutPage: React.FC = () => {
   const handleSelectAddress = (id: string) => {
     setSelectedAddressId(id);
   };
-
+  console.log("cartflag ", cartFlag);
   const handleOrder = async () => {
     if (!items.length) {
-      alert("No items to order!");
-      return;
     }
-
+    if (!selectedAddressId) {
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.street ||
+        !formData.city ||
+        !formData.state ||
+        !formData.postalCode ||
+        !formData.country ||
+        !formData.phone ||
+        !formData.email
+      ) {
+        toast.error(
+          "Please fill all the address and contact fields. or select an address from the list.  ",
+          {
+            style: {
+              color: "red",
+            },
+          }
+        );
+        return;
+      }
+    }
     if (!razorpayLoaded) {
       alert("Payment system is still loading. Please wait a moment.");
       return;
@@ -97,6 +119,7 @@ const CheckoutPage: React.FC = () => {
     try {
       const payload = {
         items,
+        cartFlag,
         address: selectedAddressId
           ? { addressId: selectedAddressId }
           : formData,
@@ -126,18 +149,24 @@ const CheckoutPage: React.FC = () => {
               razorpay_signature,
               paymentMethod: "Online",
               items,
+              cartFlag,
               address: selectedAddressId
                 ? { addressId: selectedAddressId }
                 : formData,
               totalAmount,
             });
 
-            alert("Payment successful!");
+            toast.success("Payment successful!", {
+              style: { color: "green" },
+            });
             clearOrder();
+            loadCart();
             navigate("/profile");
           } catch (err) {
             console.error(err);
-            alert("Payment verification failed!");
+            toast.error("Payment verification failed!", {
+              style: { color: "red" },
+            });
           }
         },
         prefill: {
@@ -150,54 +179,29 @@ const CheckoutPage: React.FC = () => {
 
       const rzp = new window.Razorpay(options);
 
-      // Optional: Handle payment failures
       rzp.on("payment.failed", function (response: any) {
         console.error("Payment failed:", response.error);
-        alert("❌ Payment failed. Please try again.");
+        toast.error("Payment failed. Please try again.", {
+          style: { color: "red" },
+        });
       });
 
       rzp.open();
     } catch (err) {
       console.error(err);
-      alert("Failed to create order. Please try again.");
+      toast.error("Failed to create order. Please try again.", {
+        style: { color: "red" },
+      });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] py-8 px-4 mt-48">
+    <div className="min-h-screen bg-[#F9F9F9] py-8 px-4 ">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Side */}
           <div className="space-y-6">
             {/* Contact Info */}
-            <div className="p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Contact information
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Latest dream home interiors delivered hassle-free
-              </p>
-              <div className="space-y-4">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="E-mail"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-                <input
-                  type="text"
-                  name="gstin"
-                  placeholder="GSTIN (optional)"
-                  value={formData.gstin}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-            </div>
-
-            {/* Shipping Address */}
             <div className="p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Shipping address
@@ -231,7 +235,7 @@ const CheckoutPage: React.FC = () => {
               )}
 
               {/* Manual Address */}
-              <div className="space-y-4">
+              <div className="space-y-4  mt-[30px]">
                 <input
                   type="text"
                   name="country"
@@ -304,6 +308,34 @@ const CheckoutPage: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="px-6 py-3 shadow-sm">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Contact information
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Latest dream home interiors delivered hassle-free
+              </p>
+              <div className="space-y-4">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="E-mail"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <input
+                  type="text"
+                  name="gstin"
+                  placeholder="GSTIN (optional)"
+                  value={formData.gstin}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+
+            {/* Shipping Address */}
           </div>
 
           {/* Right Side - Order Summary */}

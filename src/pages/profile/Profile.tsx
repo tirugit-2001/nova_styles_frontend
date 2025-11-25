@@ -5,7 +5,7 @@ import { Package, MapPin, LogOut } from "lucide-react";
 import useAuthStore from "../../store/useAuthStore";
 import { useCartStore } from "../../store";
 const Profile = () => {
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const { clearCart } = useCartStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -30,16 +30,16 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex min-h-screen border-2 border-r-emerald-500 bg-gray-50">
+    <div className="flex  flex-col md:flex-row min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="  flex-1 bg-white  p-6 pt-[115px]">
+      <div className="flex-1 bg-white  p-6 ">
         {/* User Profile */}
         <div className="flex flex-col items-center ">
           <div className="w-24 h-24 bg-gray-300 rounded-lg mb-3 flex items-center justify-center">
             <div className="w-16 h-16 bg-gray-400 rounded-full"></div>
           </div>
           <h4 className="text-sm font-medium text-gray-700">
-            Hello yakshith Saravu
+            {user?.username}
           </h4>
         </div>
 
@@ -50,7 +50,7 @@ const Profile = () => {
               key={ind}
               to={item.path}
               className={`{w-full flex items-center gap-3 px-4 py-3 text-gray-900 bg-gray-100 rounded-lg ${
-                pathname === item.path && "bg-brand-dark text-white"
+                pathname === item.path && "bg-orange-200 text-white"
               }`}
             >
               {item.icon}
@@ -69,7 +69,7 @@ const Profile = () => {
       </div>
 
       {/* Main Content */}
-      <div className=" flex-[5]  ">
+      <div className=" flex-[5] h-screen overflow-y-auto p-6 ">
         <Outlet />
       </div>
     </div>

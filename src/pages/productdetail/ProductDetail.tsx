@@ -71,6 +71,7 @@ const ProductDetail: React.FC = () => {
       area,
       image: product.image,
     });
+
     setActionLoading({ ...actionLoading, order: false });
     navigate("/checkout");
   };
@@ -180,7 +181,7 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 mt-32">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate(-1)}
@@ -216,7 +217,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Product Details */}
-          <div className="shadow-sm bg-white p-6 rounded">
+          <div className="shadow-sm  bg-white p-6 rounded">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
               {product?.name}
             </h1>
@@ -275,11 +276,11 @@ const ProductDetail: React.FC = () => {
             )}
 
             {/* Area Input */}
-            <div className="mb-6">
+            <div className="mb-6 ">
               <h3 className="text-sm font-medium text-gray-900 mb-3">
                 Enter Area (sq. ft)
               </h3>
-              <div className="flex items-center gap-4">
+              <div className="flex  gap-4 xs:flex-row flex-col items-center xs:gap-4">
                 <input
                   type="number"
                   value={area}
@@ -287,11 +288,11 @@ const ProductDetail: React.FC = () => {
                   onChange={(e) =>
                     setArea(e.target.value ? Number(e.target.value) : 0)
                   }
-                  className="flex-1 border border-gray-300 rounded px-4 py-2 text-gray-900"
+                  className="flex-1 border  border-gray-300 rounded px-4 py-2 text-gray-900"
                   placeholder="0"
                   min="0"
                 />
-                <div className="text-xl font-bold text-gray-900 min-w-[150px] text-right">
+                <div className="text-xl font-bold text-gray-900  text-right">
                   ₹ {totalPrice}
                 </div>
               </div>
@@ -303,8 +304,8 @@ const ProductDetail: React.FC = () => {
                 <h2 className="text-xl font-semibold">Out of Stock</h2>
               </div>
             ) : (
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-2">
+              <div className="flex xs:items-center xs:flex-row flex-col gap-4 mb-6">
+                <div className="flex  justify-center items-center gap-2">
                   <button
                     disabled={actionLoading.cart || actionLoading.order}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -326,34 +327,36 @@ const ProductDetail: React.FC = () => {
                   </button>
                 </div>
 
-                <button
-                  className="flex-1 py-3 px-6 bg-white border border-brand text-brand hover:bg-orange-50 transition-colors font-medium rounded"
-                  onClick={handleCart}
-                  disabled={actionLoading.cart || actionLoading.order}
-                >
-                  {actionLoading.cart ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Adding...
-                    </>
-                  ) : (
-                    "Add to Cart"
-                  )}
-                </button>
-                <button
-                  disabled={actionLoading.cart || actionLoading.order}
-                  onClick={handleOrder}
-                  className="flex-1 py-3 px-6 bg-brand text-white hover:bg-brand-dark transition-colors font-medium rounded"
-                >
-                  {actionLoading.order ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Order"
-                  )}
-                </button>
+                <div className="flex-1 justify-between flex gap-5 sm:">
+                  <button
+                    className="flex-1 xs:py-3 xs:px-6 bg-white border border-brand text-brand hover:bg-orange-50 transition-colors font-medium rounded"
+                    onClick={handleCart}
+                    disabled={actionLoading.cart || actionLoading.order}
+                  >
+                    {actionLoading.cart ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
+                  <button
+                    disabled={actionLoading.cart || actionLoading.order}
+                    onClick={handleOrder}
+                    className="flex-1 py-2 px-3  xs:py-3 xs:px-6 bg-brand text-white hover:bg-brand-dark transition-colors font-medium rounded"
+                  >
+                    {actionLoading.order ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Order"
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 

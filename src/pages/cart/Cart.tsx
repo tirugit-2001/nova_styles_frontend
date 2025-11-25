@@ -27,7 +27,7 @@ const Cart = () => {
   return (
     <>
       {items?.length > 0 ? (
-        <div className="flex flex-col md:flex-row py-[182px] px-5 gap-8  min-h-screen">
+        <div className="flex flex-col md:flex-row  border-2 p-5 gap-8  min-h-screen">
           <div className="flex-1 ">
             <h3 className="font-semibold">Order Summary</h3>
             <div className="flex my-4  flex-col gap-4">

@@ -18,6 +18,7 @@ declare global {
 interface OrderState {
   items: ProductCardItem[];
   totalAmount: number;
+  cartFlag?: boolean;
   addItem: (item: ProductCardItem) => void;
   setItems: (items: ProductCardItem[]) => void;
   clearOrder: () => void;

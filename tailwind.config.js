@@ -13,6 +13,9 @@ export default {
       fontFamily: {
         satoshi: ["Satoshi", "sans-serif"],
       },
+      screens: {
+        xs: "500px",
+      },
     },
   },
   plugins: [],

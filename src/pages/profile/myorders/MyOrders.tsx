@@ -9,7 +9,7 @@ const MyOrders = () => {
   }, [getOrders]);
 
   return (
-    <div className=" w-[100%] mt-[110px]  h-full flex  ">
+    <div className=" w-[100%] h-full flex">
       <div className="flex flex-col  px-2 flex-1">
         <h1 className="text-xl font-semibold mb-4 ">My Orders</h1>
 

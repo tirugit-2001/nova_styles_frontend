@@ -7,7 +7,6 @@ const MyAddress = () => {
     null
   );
 
-  console.log(userAddresses);
   useEffect(() => {
     getAddresses();
   }, [getAddresses]);
@@ -18,10 +17,9 @@ const MyAddress = () => {
 
   if (loading) return <p>Loading addresses...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-  console.log(userAddresses);
 
   return (
-    <div className=" mt-[110px]  w-[100%] h-full flex  ">
+    <div className=" w-[100%] h-full flex  ">
       <div className="flex flex-col px-2   flex-1">
         <h1 className="text-xl font-semibold mb-4">My Addresses</h1>
 

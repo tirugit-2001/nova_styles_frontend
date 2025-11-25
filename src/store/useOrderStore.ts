@@ -7,13 +7,14 @@ const useOrderStore = create<OrderState>()(
     (set, _) => ({
       items: [],
       totalAmount: 0,
+      cartFlag: false,
       addItem: (item: ProductCardItem) => {
         const newItems = [item];
         const totalAmount = newItems.reduce(
           (sum, i) => sum + i.price * i.quantity * (i.area || 1),
           0
         );
-        set({ items: newItems, totalAmount });
+        set({ items: newItems, cartFlag: false, totalAmount });
       },
       setItems: (items: ProductCardItem[]) => {
         console.log(items);
@@ -21,7 +22,7 @@ const useOrderStore = create<OrderState>()(
           (sum, i) => sum + i.price * i.quantity * (i?.area || 1),
           0
         );
-        set({ items, totalAmount });
+        set({ items, cartFlag: true, totalAmount });
       },
 
       clearOrder: () => set({ items: [], totalAmount: 0 }),
