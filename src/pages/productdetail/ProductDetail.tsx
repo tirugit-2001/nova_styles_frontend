@@ -9,6 +9,8 @@ const ProductDetail: React.FC = () => {
   const [selectedTexture, setSelectedTexture] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [area, setArea] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [width, setWidth] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [showDetails, setShowDetails] = useState<boolean>(true);
   const [product, setProduct] = useState<any>(null);
@@ -53,11 +55,14 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleOrder = () => {
+    const calculatedArea = height > 0 && width > 0 ? height * width : area;
     console.log("Order placed:", {
       productId: product._id,
       texture: selectedTexture,
       color: selectedColor,
-      area,
+      area: calculatedArea,
+      height,
+      width,
       quantity,
     });
     setActionLoading({ ...actionLoading, order: true });
@@ -68,7 +73,9 @@ const ProductDetail: React.FC = () => {
       quantity,
       selectedColor,
       selectedTexture,
-      area,
+      area: calculatedArea,
+      height,
+      width,
       image: product.image,
     });
 
@@ -77,6 +84,7 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleCart = async () => {
+    const calculatedArea = height > 0 && width > 0 ? height * width : area;
     console.log("produciuufid");
     console.log(product);
     try {
@@ -89,7 +97,9 @@ const ProductDetail: React.FC = () => {
         quantity,
         selectedColor,
         selectedTexture,
-        area,
+        area: calculatedArea,
+        height,
+        width,
         image: product.image,
       });
       toast.success("Item added to cart successfully", {
@@ -107,9 +117,16 @@ const ProductDetail: React.FC = () => {
     }
   };
   const calculateTotalPrice = () => {
-    if (area !== 0) {
-      setTotalPrice((Number(area) * product?.price * quantity).toFixed(2));
-      return (Number(area) * product?.price * quantity).toFixed(2);
+    let calculatedArea = area;
+    // If height and width are provided, calculate area from them
+    if (height > 0 && width > 0) {
+      calculatedArea = height * width;
+      setArea(calculatedArea);
+    }
+    
+    if (calculatedArea !== 0) {
+      setTotalPrice((Number(calculatedArea) * product?.price * quantity).toFixed(2));
+      return (Number(calculatedArea) * product?.price * quantity).toFixed(2);
     } else {
       setTotalPrice((Number(product?.price) * quantity).toFixed(2));
       return (Number(product?.price) * quantity).toFixed(2);
@@ -121,7 +138,7 @@ const ProductDetail: React.FC = () => {
   }, []);
   useEffect(() => {
     calculateTotalPrice();
-  }, [area, quantity]);
+  }, [area, quantity, height, width]);
 
   if (loading) {
     return (
@@ -230,7 +247,7 @@ const ProductDetail: React.FC = () => {
             {product?.paperTextures?.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                  Paper Texture
+                   Texture
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
                   {product?.paperTextures?.map((texture: string) => (
@@ -275,6 +292,49 @@ const ProductDetail: React.FC = () => {
               </div>
             )}
 
+            {/* Height and Width Input */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                Enter Dimensions (ft)
+              </h3>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-2">
+                    Height (ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={height || ""}
+                    disabled={actionLoading.cart || actionLoading.order}
+                    onChange={(e) =>
+                      setHeight(e.target.value ? Number(e.target.value) : 0)
+                    }
+                    className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-2">
+                    Width (ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={width || ""}
+                    disabled={actionLoading.cart || actionLoading.order}
+                    onChange={(e) =>
+                      setWidth(e.target.value ? Number(e.target.value) : 0)
+                    }
+                    className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Area Input */}
             <div className="mb-6 ">
               <h3 className="text-sm font-medium text-gray-900 mb-3">
@@ -283,19 +343,31 @@ const ProductDetail: React.FC = () => {
               <div className="flex  gap-4 xs:flex-row flex-col items-center xs:gap-4">
                 <input
                   type="number"
-                  value={area}
+                  value={area || ""}
                   disabled={actionLoading.cart || actionLoading.order}
-                  onChange={(e) =>
-                    setArea(e.target.value ? Number(e.target.value) : 0)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value ? Number(e.target.value) : 0;
+                    setArea(value);
+                    // Clear height and width when area is manually entered
+                    if (value > 0) {
+                      setHeight(0);
+                      setWidth(0);
+                    }
+                  }}
                   className="flex-1 border  border-gray-300 rounded px-4 py-2 text-gray-900"
                   placeholder="0"
                   min="0"
+                  step="0.01"
                 />
                 <div className="text-xl font-bold text-gray-900  text-right">
                   ₹ {totalPrice}
                 </div>
               </div>
+              {height > 0 && width > 0 && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Calculated area: {height * width} sq. ft
+                </p>
+              )}
             </div>
 
             {/* Quantity Selector & Buttons */}
@@ -378,45 +450,44 @@ const ProductDetail: React.FC = () => {
 
               {showDetails && (
                 <div className="mt-4 space-y-4 text-sm text-gray-700">
-                  <div>
-                    <h4 className="font-semibold mb-2">Material:</h4>
+                  {/* <div> */}
+                    {/* <h4 className="font-semibold mb-2">Material:</h4>
                     <ul className="list-disc list-inside">
                       {product?.material?.map((m: string) => (
                         <li key={m}>{m}</li>
                       ))}
-                    </ul>
-                  </div>
+                    </ul> */}
+                  {/* </div> */}
 
-                  <div>
-                    <h4 className="font-semibold mb-2">Print:</h4>
+                  {/* <div> */}
+                    {/* <h4 className="font-semibold mb-2">Print:</h4>
                     <ul className="list-disc list-inside">
                       {product?.print?.map((p: string) => (
                         <li key={p}>{p}</li>
                       ))}
-                    </ul>
-                  </div>
+                    </ul> */}
+                  {/* </div> */}
 
-                  <div>
-                    <h4 className="font-semibold mb-2">Installation:</h4>
+                  {/* <div> */}
+                    {/* <h4 className="font-semibold mb-2">Installation:</h4>
                     <ul className="list-disc list-inside">
                       {product?.installation?.map((i: string) => (
                         <li key={i}>{i}</li>
                       ))}
-                    </ul>
+                    </ul> */}
+                  {/* </div> */}
+                  <div>
+                    <h4 className="font-semibold mb-2">Description:</h4>
+                    <p>{product?.description} available</p>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2">Application:</h4>
+                    <h4 className="font-semibold mb-2">Material:</h4>
                     <ul className="list-disc list-inside">
-                      {product?.application?.map((a: string) => (
+                      {product?.paperTextures?.map((a: string) => (
                         <li key={a}>{a}</li>
                       ))}
                     </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">Stock:</h4>
-                    <p>{product?.stock} available</p>
                   </div>
                 </div>
               )}

@@ -7,6 +7,8 @@ interface ProductCardItem {
   selectedTexture?: string;
   image?: string;
   area?: number;
+  height?: number;
+  width?: number;
   originalPrice?: number;
   discountedPrice?: number;
 }
