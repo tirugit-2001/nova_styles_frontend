@@ -30,8 +30,8 @@ const NavBar = () => {
   };
   return (
     <nav className={` sticky top-0 z-[999]`}>
-      <div className="bg-gray-200 py-2 px-4 md:px-8 ">
-        <div className="max-w-7xl mx-auto flex justify-end items-center gap-6 text-sm">
+      <div className="bg-[#DFE6DE] py-2  md:px-8 ">
+        <div className=" mx-auto flex justify-end items-center gap-2 text-sm">
           <a
             href="mailto:info@novastyles.com"
             className="flex items-center gap-2 text-gray-700 hover:text-amber-600 transition-colors"
@@ -49,7 +49,7 @@ const NavBar = () => {
           </a>
         </div>
       </div>
-      <div className=" bg-white px-4  xl:px-8 py-4">
+      <div className=" bg-white px-4  xl:px-10 py-8">
         <div className=" md:mx-8 flex items-center gap-4 ">
           <div className="gap-6 flex justify-between items-center md:items-center flex-1">
             <div className="flex gap-3 lg:gap-10 items-center">
@@ -87,7 +87,7 @@ const NavBar = () => {
                         }
                       }
                     }}
-                    className="text-md font-medium text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
+                    className="font-medium text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
                   >
                     {section.label}
                   </Link>
