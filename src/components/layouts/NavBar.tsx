@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, User, Mail, Phone, Menu, X } from "lucide-react";
+import { ShoppingCart, CircleUser, Mail, Phone, Menu, X } from "lucide-react";
 
 import logo from "../../../public/novastyleslogo.svg";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,11 +16,12 @@ const NavBar = () => {
   console.log("user");
   const { items } = useCartStore();
 
-  const productCategories = [
-    { label: "Wall papers", path: "/categories/wallpapers" },
-    { label: "Wooden flooring", path: "/categories/flooring" },
-    { label: "Wall decors", path: "/categories/walldecors" },
-    { label: "Wall panels", path: "/categories/wallpanels" },
+  const applicationSections = [
+    { label: "Kids & Playful Spaces", id: "kids-playful-spaces" },
+    { label: "Heritage & Vintage Arts", id: "heritage-vintage-arts" },
+    { label: "Indian Cultural Art – Pichwai", id: "indian-cultural-art-pichwai" },
+    { label: "Tropical Nature & Leaves", id: "tropical-nature-leaves" },
+    { label: "Peacock Elegance Collection", id: "peacock-elegance-collection" },
   ];
 
   const [showEmailDignIn, setEmailSignIn] = useState(false);
@@ -60,41 +61,41 @@ const NavBar = () => {
                 />
               </Link>
               <div className="lg:gap-9 gap-3 md:gap-6   hidden md:flex ">
-                {productCategories.map((category) => (
-                  <a
-                    key={category.label}
-                    href={category.path}
-                    className="text-md font-medium  text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap"
+                {applicationSections.map((section) => (
+                  <Link
+                    key={section.id}
+                    to={`/#${section.id}`}
+                    onClick={(e) => {
+                      const currentPath = window.location.pathname;
+                      if (currentPath !== "/") {
+                        // If not on home page, navigate first, then scroll
+                        navigate(`/#${section.id}`);
+                        setTimeout(() => {
+                          const element = document.getElementById(section.id);
+                          if (element) {
+                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }
+                        }, 300);
+                      } else {
+                        // If already on home page, just scroll
+                        e.preventDefault();
+                        const element = document.getElementById(section.id);
+                        if (element) {
+                          element.scrollIntoView({ behavior: "smooth", block: "start" });
+                          // Update URL hash without scrolling again
+                          window.history.pushState(null, "", `#${section.id}`);
+                        }
+                      }
+                    }}
+                    className="text-md font-medium text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
                   >
-                    {category.label}
-                  </a>
+                    {section.label}
+                  </Link>
                 ))}
               </div>
             </div>
             <div className="flex relative flex-1 justify-end items-center md:hidden  gap-3">
               <div className=" flex items-center gap-2 md:hidden">
-                {!user ? (
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <User
-                      onClick={() => {
-                        navigate("/login");
-                      }}
-                      size={20}
-                      className="text-gray-700"
-                    />
-                  </button>
-                ) : (
-                  <div
-                    onClick={() => {
-                      navigate("/profile");
-                    }}
-                    className="flex gap-2 cursor-pointer"
-                  >
-                    <User size={20} className="text-gray-700" />
-                    <span className=" font-semibold"> {user?.username}</span>
-                  </div>
-                )}
-
                 <button
                   onClick={() => {
                     navigate("/cart");
@@ -110,6 +111,28 @@ const NavBar = () => {
                     <ShoppingCart size={20} className="text-gray-700" />
                   </div>
                 </button>
+
+                {!user ? (
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <CircleUser
+                      onClick={() => {
+                        navigate("/login");
+                      }}
+                      size={20}
+                      className="text-gray-700"
+                    />
+                  </button>
+                ) : (
+                  <div
+                    onClick={() => {
+                      navigate("/profile");
+                    }}
+                    className="flex gap-2 cursor-pointer"
+                  >
+                    <CircleUser size={20} className="text-gray-700" />
+                    <span className=" font-semibold"> {user?.username}</span>
+                  </div>
+                )}
               </div>
               <Menu
                 size={20}
@@ -125,14 +148,36 @@ const NavBar = () => {
                       size={20}
                     />
                   </div>
-                  {productCategories.map((category) => (
+                  {applicationSections.map((section) => (
                     <Link
-                      onClick={handleToggle}
-                      key={category.label}
-                      to={category.path}
-                      className="text-sm font-medium  text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap"
+                      onClick={(e) => {
+                        handleToggle();
+                        const currentPath = window.location.pathname;
+                        if (currentPath !== "/") {
+                          // If not on home page, navigate first, then scroll
+                          navigate(`/#${section.id}`);
+                          setTimeout(() => {
+                            const element = document.getElementById(section.id);
+                            if (element) {
+                              element.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }
+                          }, 300);
+                        } else {
+                          // If already on home page, just scroll
+                          e.preventDefault();
+                          const element = document.getElementById(section.id);
+                          if (element) {
+                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                            // Update URL hash without scrolling again
+                            window.history.pushState(null, "", `#${section.id}`);
+                          }
+                        }
+                      }}
+                      key={section.id}
+                      to={`/#${section.id}`}
+                      className="text-sm font-medium text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
                     >
-                      {category.label}
+                      {section.label}
                     </Link>
                   ))}
                 </div>
@@ -141,28 +186,6 @@ const NavBar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-2 ml-4">
-            {!user ? (
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <User
-                  onClick={() => {
-                    navigate("/login");
-                  }}
-                  size={20}
-                  className="text-gray-700"
-                />
-              </button>
-            ) : (
-              <div
-                onClick={() => {
-                  navigate("/profile");
-                }}
-                className="flex gap-2 cursor-pointer"
-              >
-                <User size={20} className="text-gray-700" />
-                <span className=" font-semibold"> {user?.username}</span>
-              </div>
-            )}
-
             <button
               onClick={() => {
                 navigate("/cart");
@@ -178,6 +201,28 @@ const NavBar = () => {
                 <ShoppingCart size={20} className="text-gray-700" />
               </div>
             </button>
+
+            {!user ? (
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <CircleUser
+                  onClick={() => {
+                    navigate("/login");
+                  }}
+                  size={20}
+                  className="text-gray-700"
+                />
+              </button>
+            ) : (
+              <div
+                onClick={() => {
+                  navigate("/profile");
+                }}
+                className="flex gap-2 cursor-pointer"
+              >
+                <CircleUser size={20} className="text-gray-700" />
+                <span className=" font-semibold"> {user?.username}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
