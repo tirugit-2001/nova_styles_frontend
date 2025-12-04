@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import api from "../../service/api";
 
 const ProductDetail: React.FC = () => {
-  const [selectedTexture, setSelectedTexture] = useState<string>("");
+  const [selectedTexture, setSelectedTexture] = useState<any>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [area, setArea] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
@@ -24,11 +24,8 @@ const ProductDetail: React.FC = () => {
   }>({ cart: false, order: false });
   const { addItem } = useOrderStore();
   const { addToCart } = useCartStore();
-
   const { id } = useParams();
-  console.log(id);
   const navigate = useNavigate();
-
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
@@ -37,8 +34,8 @@ const ProductDetail: React.FC = () => {
       console.log(data);
       if (data) {
         setProduct(data);
-        setTotalPrice(data.price.toFixed(2));
-        setSelectedTexture(data?.paperTextures?.[0] || "");
+        // setTotalPrice(data.price.toFixed(2));
+        setSelectedTexture(data?.paperTextures?.[0] || null);
         setSelectedColor(data?.colours?.[0] || "");
       }
     } catch (error: any) {
@@ -56,24 +53,19 @@ const ProductDetail: React.FC = () => {
 
   const handleOrder = () => {
     const calculatedArea = height > 0 && width > 0 ? height * width : area;
-    console.log("Order placed:", {
-      productId: product._id,
-      texture: selectedTexture,
-      color: selectedColor,
-      area: calculatedArea,
-      height,
-      width,
-      quantity,
-    });
+    const rate = selectedTexture?.rate ?? product?.price ?? 0;
+    const chargeableArea =
+      calculatedArea > 0 ? Math.max(30, calculatedArea) : 1;
+
     setActionLoading({ ...actionLoading, order: true });
     addItem({
       _id: product._id,
       name: product.name,
-      price: product.price,
+      price: rate,
       quantity,
       selectedColor,
       selectedTexture,
-      area: calculatedArea,
+      area: chargeableArea,
       height,
       width,
       image: product.image,
@@ -85,6 +77,9 @@ const ProductDetail: React.FC = () => {
 
   const handleCart = async () => {
     const calculatedArea = height > 0 && width > 0 ? height * width : area;
+    const rate = selectedTexture?.rate ?? product?.price ?? 0;
+    const chargeableArea =
+      calculatedArea > 0 ? Math.max(30, calculatedArea) : 1;
     console.log("produciuufid");
     console.log(product);
     try {
@@ -93,11 +88,11 @@ const ProductDetail: React.FC = () => {
       await addToCart({
         _id: product._id,
         name: product.name,
-        price: product.price,
+        price: rate,
         quantity,
         selectedColor,
         selectedTexture,
-        area: calculatedArea,
+        area: chargeableArea,
         height,
         width,
         image: product.image,
@@ -118,18 +113,21 @@ const ProductDetail: React.FC = () => {
   };
   const calculateTotalPrice = () => {
     let calculatedArea = area;
-    // If height and width are provided, calculate area from them
+
     if (height > 0 && width > 0) {
       calculatedArea = height * width;
       setArea(calculatedArea);
     }
-    
-    if (calculatedArea !== 0) {
-      setTotalPrice((Number(calculatedArea) * product?.price * quantity).toFixed(2));
-      return (Number(calculatedArea) * product?.price * quantity).toFixed(2);
+    const rate = selectedTexture?.rate ?? product?.price ?? 0;
+    if (calculatedArea > 0) {
+      const chargeable = calculatedArea <= 30 ? 30 : calculatedArea;
+      const total = Number(chargeable) * Number(rate) * Number(quantity);
+      setTotalPrice(total.toFixed(2));
+      return total.toFixed(2);
     } else {
-      setTotalPrice((Number(product?.price) * quantity).toFixed(2));
-      return (Number(product?.price) * quantity).toFixed(2);
+      const total = Number(rate) * Number(quantity);
+      setTotalPrice(total.toFixed(2));
+      return total.toFixed(2);
     }
   };
 
@@ -138,7 +136,7 @@ const ProductDetail: React.FC = () => {
   }, []);
   useEffect(() => {
     calculateTotalPrice();
-  }, [area, quantity, height, width]);
+  }, [area, quantity, height, width, selectedTexture, product]);
 
   if (loading) {
     return (
@@ -239,28 +237,29 @@ const ProductDetail: React.FC = () => {
               {product?.name}
             </h1>
             <p className="text-gray-700 mb-4">{product?.description}</p>
-            <p className="text-2xl font-medium text-brand mb-6">
-              ₹ {product?.price.toLocaleString()}
-            </p>
+            {/* <p className="text-2xl font-medium text-brand mb-6">
+              ₹ {product?.price?.toLocaleString()}
+            </p> */}
 
             {/* Paper Texture */}
             {product?.paperTextures?.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">
-                   Texture
+                  Texture
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
-                  {product?.paperTextures?.map((texture: string) => (
+                  {product?.paperTextures?.map((texture: any) => (
                     <button
-                      key={texture}
+                      key={texture?._id || texture?.name}
                       onClick={() => setSelectedTexture(texture)}
                       className={`py-2 px-3 border text-sm rounded ${
-                        selectedTexture === texture
+                        selectedTexture?.name === texture?.name
                           ? "border-brand bg-brand text-white"
                           : "border-gray-300 hover:border-gray-400"
                       }`}
                     >
-                      {texture}
+                      {texture?.name}
+                      {texture?.rate ? ` - ₹${texture.rate}` : ""}
                     </button>
                   ))}
                 </div>
@@ -451,7 +450,7 @@ const ProductDetail: React.FC = () => {
               {showDetails && (
                 <div className="mt-4 space-y-4 text-sm text-gray-700">
                   {/* <div> */}
-                    {/* <h4 className="font-semibold mb-2">Material:</h4>
+                  {/* <h4 className="font-semibold mb-2">Material:</h4>
                     <ul className="list-disc list-inside">
                       {product?.material?.map((m: string) => (
                         <li key={m}>{m}</li>
@@ -460,7 +459,7 @@ const ProductDetail: React.FC = () => {
                   {/* </div> */}
 
                   {/* <div> */}
-                    {/* <h4 className="font-semibold mb-2">Print:</h4>
+                  {/* <h4 className="font-semibold mb-2">Print:</h4>
                     <ul className="list-disc list-inside">
                       {product?.print?.map((p: string) => (
                         <li key={p}>{p}</li>
@@ -469,7 +468,7 @@ const ProductDetail: React.FC = () => {
                   {/* </div> */}
 
                   {/* <div> */}
-                    {/* <h4 className="font-semibold mb-2">Installation:</h4>
+                  {/* <h4 className="font-semibold mb-2">Installation:</h4>
                     <ul className="list-disc list-inside">
                       {product?.installation?.map((i: string) => (
                         <li key={i}>{i}</li>
@@ -484,8 +483,11 @@ const ProductDetail: React.FC = () => {
                   <div>
                     <h4 className="font-semibold mb-2">Material:</h4>
                     <ul className="list-disc list-inside">
-                      {product?.paperTextures?.map((a: string) => (
-                        <li key={a}>{a}</li>
+                      {product?.paperTextures?.map((a: any) => (
+                        <li key={a?._id || a?.name}>
+                          {a?.name}
+                          {a?.rate ? ` - ₹${a.rate}` : ""}
+                        </li>
                       ))}
                     </ul>
                   </div>
