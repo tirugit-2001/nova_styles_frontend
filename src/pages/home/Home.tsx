@@ -194,7 +194,7 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      <div className="mx-auto my-7 max-w-7xl">
+      <div className="mx-auto my-20 max-w-7xl">
         <div >
           <h2 className="capitalize font-semibold">our trending products</h2>
           <p className="my-1">Our trending products are listed here.</p>
@@ -213,7 +213,7 @@ const Home: React.FC = () => {
       </div>
       {
         trendingproducts.length > 0 && (
-      <div className="mx-auto my-7 max-w-7xl">
+      <div className="mx-auto my-20 max-w-7xl">
         <div>
           <h2 className="capitalize font-semibold">
             Highest selling products
@@ -232,7 +232,7 @@ const Home: React.FC = () => {
       {applicationSections
         .filter((section) => section.products.length > 0)
         .map((section) => (
-          <div id={section.id} className="mx-auto my-7 max-w-7xl scroll-mt-20" key={section.title}>
+          <div id={section.id} className="mx-auto my-20 max-w-7xl scroll-mt-20" key={section.title}>
             <div>
               <h2 className="capitalize font-semibold">{section.title}</h2>
               <p className="my-1">{section.subtitle}</p>

@@ -7,9 +7,16 @@ const ProductCard = ({ product, handleCart }: ProductCardProps) => {
   const navigate = useNavigate();
   const { items } = useCartStore();
 
+  const handleCardClick = () => {
+    navigate(`/product/${product?._id}`);
+  };
+
   return (
-    <div key={product?._id}>
-      <div className="bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+    <div key={product?._id} className="cursor-pointer">
+      <div 
+        className="bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+        onClick={handleCardClick}
+      >
         <div className="relative aspect-[3/4] group">
           <img
             src={product?.image}
@@ -17,10 +24,11 @@ const ProductCard = ({ product, handleCart }: ProductCardProps) => {
             className="w-full h-full object-cover"
           />
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click when cart button is clicked
               handleCart(product);
             }}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-colors ${
+            className={`absolute top-3 right-3 p-2 rounded-full transition-colors z-10 ${
               items?.find((item) => item.productId == product?._id)
                 ? "bg-brand text-white"
                 : "bg-white text-gray-700 hover:bg-gray-100"
@@ -32,7 +40,7 @@ const ProductCard = ({ product, handleCart }: ProductCardProps) => {
       </div>
 
       <div className="mt-3 flex items-center justify-between">
-        <div>
+        <div onClick={handleCardClick} className="flex-1 cursor-pointer">
           <h3 className="text-sm font-medium text-gray-900 mb-1">
             {product?.name}
           </h3>
@@ -46,7 +54,10 @@ const ProductCard = ({ product, handleCart }: ProductCardProps) => {
           </div>
         </div>
         <button
-          onClick={() => navigate(`/product/${product?._id}`)}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click when order button is clicked
+            navigate(`/product/${product?._id}`);
+          }}
           className="py-2 px-4 text-brand hover:bg-brand-light hover:text-white transition-colors text-sm font-medium flex items-center gap-2"
         >
           Order
