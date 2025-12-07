@@ -24,6 +24,7 @@ const Cart = () => {
   const handleItemRemove = (productId: string) => {
     removeCartItem(productId);
   };
+  console.log("cart items", items);
   return (
     <>
       {items?.length > 0 ? (
@@ -34,6 +35,7 @@ const Cart = () => {
               {items?.map((item: any) => (
                 <div>
                   <SummaryProductCard
+                    isAvailable={item?.isAvailable ?? true}
                     component="cart"
                     handleRemove={() => {
                       handleItemRemove(item?.productId);

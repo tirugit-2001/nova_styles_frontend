@@ -8,16 +8,15 @@ import api from "../../service/api";
 const ProductDetail: React.FC = () => {
   const [selectedTexture, setSelectedTexture] = useState<any>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
-  const [area, setArea] = useState<number>(0);
-  const [height, setHeight] = useState<number>(0);
-  const [width, setWidth] = useState<number>(0);
+  const [area, setArea] = useState<number>(1);
+  const [height, setHeight] = useState<number>(1);
+  const [width, setWidth] = useState<number>(1);
   const [quantity, setQuantity] = useState<number>(1);
   const [showDetails, setShowDetails] = useState<boolean>(true);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<string>("0");
-
   const [actionLoading, setActionLoading] = useState<{
     cart: boolean;
     order: boolean;
@@ -50,7 +49,6 @@ const ProductDetail: React.FC = () => {
       setLoading(false);
     }
   };
-
   const handleOrder = () => {
     const calculatedArea = height > 0 && width > 0 ? height * width : area;
     const rate = selectedTexture?.rate ?? product?.price ?? 0;
@@ -64,7 +62,7 @@ const ProductDetail: React.FC = () => {
       price: rate,
       quantity,
       selectedColor,
-      selectedTexture,
+      selectedTexture: selectedTexture.name,
       area: chargeableArea,
       height,
       width,
@@ -74,7 +72,6 @@ const ProductDetail: React.FC = () => {
     setActionLoading({ ...actionLoading, order: false });
     navigate("/checkout");
   };
-
   const handleCart = async () => {
     const calculatedArea = height > 0 && width > 0 ? height * width : area;
     const rate = selectedTexture?.rate ?? product?.price ?? 0;
@@ -91,7 +88,7 @@ const ProductDetail: React.FC = () => {
         price: rate,
         quantity,
         selectedColor,
-        selectedTexture,
+        selectedTexture: selectedTexture.name,
         area: chargeableArea,
         height,
         width,
@@ -119,7 +116,7 @@ const ProductDetail: React.FC = () => {
       setArea(calculatedArea);
     }
     const rate = selectedTexture?.rate ?? product?.price ?? 0;
-    if (calculatedArea > 0) {
+    if (calculatedArea >= 0) {
       const chargeable = calculatedArea <= 30 ? 30 : calculatedArea;
       const total = Number(chargeable) * Number(rate) * Number(quantity);
       setTotalPrice(total.toFixed(2));
@@ -130,13 +127,23 @@ const ProductDetail: React.FC = () => {
       return total.toFixed(2);
     }
   };
-
+  const handleHeightWidthChange = (type: string, val: any) => {
+    if (val < 0) return;
+    if (type === "height") {
+      setHeight(Number(val));
+    } else if (type === "width") {
+      setWidth(Number(val));
+    }
+  };
+  const calculatedArea = height > 0 && width > 0 ? height * width : area;
+  const chargeableArea = calculatedArea > 0 ? Math.max(30, calculatedArea) : 0;
   useEffect(() => {
     fetchProductDetails();
   }, []);
   useEffect(() => {
     calculateTotalPrice();
   }, [area, quantity, height, width, selectedTexture, product]);
+  console.log(product, "product");
 
   if (loading) {
     return (
@@ -292,87 +299,99 @@ const ProductDetail: React.FC = () => {
             )}
 
             {/* Height and Width Input */}
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Enter Dimensions (ft)
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm text-gray-700 mb-2">
-                    Height (ft)
-                  </label>
-                  <input
-                    type="number"
-                    value={height || ""}
-                    disabled={actionLoading.cart || actionLoading.order}
-                    onChange={(e) =>
-                      setHeight(e.target.value ? Number(e.target.value) : 0)
-                    }
-                    className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
-                    placeholder="0"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700 mb-2">
-                    Width (ft)
-                  </label>
-                  <input
-                    type="number"
-                    value={width || ""}
-                    disabled={actionLoading.cart || actionLoading.order}
-                    onChange={(e) =>
-                      setWidth(e.target.value ? Number(e.target.value) : 0)
-                    }
-                    className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
-                    placeholder="0"
-                    min="0"
-                    step="0.01"
-                  />
+            {product?.stock > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">
+                  Enter Dimensions (ft)
+                </h3>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm text-gray-700 mb-2">
+                      Height (ft)
+                    </label>
+                    <input
+                      type="number"
+                      value={height || ""}
+                      disabled={actionLoading.cart || actionLoading.order}
+                      onChange={(e) => {
+                        handleHeightWidthChange("height", e.target.value);
+                      }}
+                      className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-700 mb-2">
+                      Width (ft)
+                    </label>
+                    <input
+                      type="number"
+                      value={width || ""}
+                      disabled={actionLoading.cart || actionLoading.order}
+                      onChange={(e) =>
+                        setWidth(e.target.value ? Number(e.target.value) : 0)
+                      }
+                      className="w-full border border-gray-300 rounded px-4 py-2 text-gray-900"
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Area Input */}
-            <div className="mb-6 ">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Enter Area (sq. ft)
-              </h3>
-              <div className="flex  gap-4 xs:flex-row flex-col items-center xs:gap-4">
-                <input
-                  type="number"
-                  value={area || ""}
-                  disabled={actionLoading.cart || actionLoading.order}
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : 0;
-                    setArea(value);
-                    // Clear height and width when area is manually entered
-                    if (value > 0) {
-                      setHeight(0);
-                      setWidth(0);
-                    }
-                  }}
-                  className="flex-1 border  border-gray-300 rounded px-4 py-2 text-gray-900"
-                  placeholder="0"
-                  min="0"
-                  step="0.01"
-                />
-                <div className="text-xl font-bold text-gray-900  text-right">
-                  ₹ {totalPrice}
+            {product?.stock > 0 && (
+              <div className="mb-6 ">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">
+                  Enter Area (sq. ft)
+                </h3>
+                <div className="flex  gap-4 xs:flex-row flex-col items-center xs:gap-4">
+                  <input
+                    type="text"
+                    value={area || ""}
+                    readOnly
+                    disabled={actionLoading.cart || actionLoading.order}
+                    className="flex-1 border  border-gray-300 rounded px-4 py-2 text-gray-900"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                  />
+                  <div className="text-xl font-bold text-gray-900  text-right">
+                    ₹ {totalPrice}
+                  </div>
                 </div>
+                {/* Pricing Logic Display */}
+                {height > 0 && width > 0 && (
+                  <div className="mt-2 text-sm text-gray-700">
+                    <p>
+                      Calculated Area: <strong>{calculatedArea} sq.ft</strong>
+                    </p>
+
+                    {calculatedArea < 30 ? (
+                      <p className="text-orange-600 text-xs mt-1">
+                        Minimum billable area is <strong>30 sq.ft</strong>. You
+                        will be charged for <strong>30 sq.ft</strong>.
+                      </p>
+                    ) : (
+                      <p className="text-green-600 text-xs mt-1">
+                        Billable Area: <strong>{chargeableArea} sq.ft</strong>
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-              {height > 0 && width > 0 && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Calculated area: {height * width} sq. ft
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Quantity Selector & Buttons */}
-            {quantity == 0 ? (
+            {product?.stock == 0 ? (
               <div>
-                <h2 className="text-xl font-semibold">Out of Stock</h2>
+                <h2 className="text-xl text-red-400 font-semibold">
+                  Out of Stock
+                </h2>
               </div>
             ) : (
               <div className="flex xs:items-center xs:flex-row flex-col gap-4 mb-6">

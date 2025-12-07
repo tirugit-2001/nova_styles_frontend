@@ -2,7 +2,8 @@ import React from "react";
 import { Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
 
 // import logo from "../../../public/novastyleslogo.svg";
-import logo from "../../../public/novastyleslogo.svg";
+// import logo from "../../../public/novastyleslogo.svg";
+import logo from "../../../public/footer_logo.png";
 import { Link } from "react-router-dom";
 
 interface FooterProps {
@@ -56,8 +57,12 @@ const Footer: React.FC<FooterProps> = ({
             <div className="">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <a href="/">
-                  <div className="flex gap-2">
-                    <img src={logo} alt="#" className="text-white" />
+                  <div className="flex  w-[150px]  gap-2">
+                    <img
+                      src={logo}
+                      alt="#"
+                      className="text-white object-cover"
+                    />
                   </div>
                 </a>
               </div>

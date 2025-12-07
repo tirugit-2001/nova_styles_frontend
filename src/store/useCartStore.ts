@@ -85,6 +85,8 @@ const useCartStore = create<CartState>()(
               selectedTexture: product?.selectedTexture,
               name: product?.name,
               image: product?.image || "",
+              height: product?.height,
+              width: product?.width,
             });
             set({
               items: data.cart.items,
@@ -102,12 +104,13 @@ const useCartStore = create<CartState>()(
                   : i
               );
             } else {
+              console.log("product price ", product.price);
               updated = [
                 ...items,
                 {
                   productId: product._id,
                   quantity: product.quantity ? product.quantity : 1,
-                  product,
+                  product: product,
                 },
               ];
             }

@@ -44,6 +44,7 @@ const CheckoutPage: React.FC = () => {
     postalCode: "",
     phone: "",
   });
+  console.log("items", items);
 
   // Fetch user addresses on mount
   useEffect(() => {

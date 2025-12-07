@@ -19,7 +19,10 @@ const NavBar = () => {
   const applicationSections = [
     { label: "Kids & Playful Spaces", id: "kids-playful-spaces" },
     { label: "Heritage & Vintage Arts", id: "heritage-vintage-arts" },
-    { label: "Indian Cultural Art – Pichwai", id: "indian-cultural-art-pichwai" },
+    {
+      label: "Indian Cultural Art – Pichwai",
+      id: "indian-cultural-art-pichwai",
+    },
     { label: "Tropical Nature & Leaves", id: "tropical-nature-leaves" },
     { label: "Peacock Elegance Collection", id: "peacock-elegance-collection" },
   ];
@@ -73,7 +76,10 @@ const NavBar = () => {
                         setTimeout(() => {
                           const element = document.getElementById(section.id);
                           if (element) {
-                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                            element.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
                           }
                         }, 300);
                       } else {
@@ -81,13 +87,16 @@ const NavBar = () => {
                         e.preventDefault();
                         const element = document.getElementById(section.id);
                         if (element) {
-                          element.scrollIntoView({ behavior: "smooth", block: "start" });
+                          element.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
                           // Update URL hash without scrolling again
                           window.history.pushState(null, "", `#${section.id}`);
                         }
                       }
                     }}
-                    className="font-medium text-[#4D4D4D] hover:text-brand transition-colors whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
+                    className="font-medium text-[#4D4D4D] hover:text-brand transition-colors text-sm whitespace-nowrap relative pb-1 hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-[2px] hover:after:bg-brand-light"
                   >
                     {section.label}
                   </Link>
@@ -159,7 +168,10 @@ const NavBar = () => {
                           setTimeout(() => {
                             const element = document.getElementById(section.id);
                             if (element) {
-                              element.scrollIntoView({ behavior: "smooth", block: "start" });
+                              element.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
                             }
                           }, 300);
                         } else {
@@ -167,9 +179,16 @@ const NavBar = () => {
                           e.preventDefault();
                           const element = document.getElementById(section.id);
                           if (element) {
-                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                            element.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
                             // Update URL hash without scrolling again
-                            window.history.pushState(null, "", `#${section.id}`);
+                            window.history.pushState(
+                              null,
+                              "",
+                              `#${section.id}`
+                            );
                           }
                         }
                       }}

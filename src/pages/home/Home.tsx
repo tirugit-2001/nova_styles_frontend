@@ -76,7 +76,9 @@ const Home: React.FC = () => {
 
   // Filter products where isTrending is true
   const trendingProductsList = useMemo(() => {
-    const filtered = product.filter((product: any) => product.isTrending === true);
+    const filtered = product.filter(
+      (product: any) => product.isTrending === true
+    );
     console.log("trendingProductsList", filtered);
     return filtered;
   }, [product]);
@@ -127,9 +129,11 @@ const Home: React.FC = () => {
           return section.matchValues.some((matchValue: string) => {
             const normalizedMatch = normalized(matchValue);
             // Check if application contains the match value or vice versa (for partial matches)
-            return normalizedApp === normalizedMatch || 
-                   normalizedApp.includes(normalizedMatch) || 
-                   normalizedMatch.includes(normalizedApp);
+            return (
+              normalizedApp === normalizedMatch ||
+              normalizedApp.includes(normalizedMatch) ||
+              normalizedMatch.includes(normalizedApp)
+            );
           });
         })
       ),
@@ -168,7 +172,11 @@ const Home: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
           {product?.map((product: any) => (
-            <ProductCard key={product._id} handleCart={handleCart} product={product} />
+            <ProductCard
+              key={product._id}
+              handleCart={handleCart}
+              product={product}
+            />
           ))}
         </div>
         {hasMore && (
@@ -195,14 +203,18 @@ const Home: React.FC = () => {
       </div>
 
       <div className="mx-auto my-7 max-w-7xl">
-        <div >
+        <div>
           <h2 className="capitalize font-semibold">our trending products</h2>
           <p className="my-1">Our trending products are listed here.</p>
         </div>
         <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
           {trendingProductsList.length > 0 ? (
             trendingProductsList.map((product: any) => (
-              <ProductCard key={product._id} handleCart={handleCart} product={product} />
+              <ProductCard
+                key={product._id}
+                handleCart={handleCart}
+                product={product}
+              />
             ))
           ) : (
             <p className="text-gray-500 col-span-full">
@@ -211,35 +223,46 @@ const Home: React.FC = () => {
           )}
         </div>
       </div>
-      {
-        trendingproducts.length > 0 && (
-      <div className="mx-auto my-7 max-w-7xl">
-        <div>
-          <h2 className="capitalize font-semibold">
-            Highest selling products
-          </h2>
-          <p className="my-1">
-            Our highest selling products are listed here.
-          </p>
+      {trendingproducts.length > 0 && (
+        <div className="mx-auto my-10 max-w-7xl">
+          <div>
+            <h2 className="capitalize font-semibold">
+              Highest selling products
+            </h2>
+            <p className="my-1">
+              Our highest selling products are listed here.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
+            {trendingproducts?.map((product: any) => (
+              <ProductCard
+                key={product._id}
+                handleCart={handleCart}
+                product={product}
+              />
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
-          {trendingproducts?.map((product: any) => (
-            <ProductCard key={product._id} handleCart={handleCart} product={product} />
-          ))}
-        </div>
-      </div>
       )}
       {applicationSections
         .filter((section) => section.products.length > 0)
         .map((section) => (
-          <div id={section.id} className="mx-auto my-7 max-w-7xl scroll-mt-20" key={section.title}>
+          <div
+            id={section.id}
+            className="mx-auto my-9 max-w-7xl scroll-mt-20"
+            key={section.title}
+          >
             <div>
               <h2 className="capitalize font-semibold">{section.title}</h2>
               <p className="my-1">{section.subtitle}</p>
             </div>
             <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
               {section.products.map((product: any) => (
-                <ProductCard key={product._id} handleCart={handleCart} product={product} />
+                <ProductCard
+                  key={product._id}
+                  handleCart={handleCart}
+                  product={product}
+                />
               ))}
             </div>
           </div>
