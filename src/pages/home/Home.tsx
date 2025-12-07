@@ -202,7 +202,7 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      <div className="mx-auto my-7 max-w-7xl">
+      <div className="mx-auto my-20 max-w-7xl">
         <div>
           <h2 className="capitalize font-semibold">our trending products</h2>
           <p className="my-1">Our trending products are listed here.</p>
@@ -223,35 +223,23 @@ const Home: React.FC = () => {
           )}
         </div>
       </div>
-      {trendingproducts.length > 0 && (
-        <div className="mx-auto my-10 max-w-7xl">
-          <div>
-            <h2 className="capitalize font-semibold">
-              Highest selling products
-            </h2>
-            <p className="my-1">
-              Our highest selling products are listed here.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
-            {trendingproducts?.map((product: any) => (
-              <ProductCard
-                key={product._id}
-                handleCart={handleCart}
-                product={product}
-              />
-            ))}
-          </div>
+      {
+        trendingproducts.length > 0 && (
+      <div className="mx-auto my-20 max-w-7xl">
+        <div>
+          <h2 className="capitalize font-semibold">
+            Highest selling products
+          </h2>
+          <p className="my-1">
+            Our highest selling products are listed here.
+          </p>
         </div>
+      </div>
       )}
       {applicationSections
         .filter((section) => section.products.length > 0)
         .map((section) => (
-          <div
-            id={section.id}
-            className="mx-auto my-9 max-w-7xl scroll-mt-20"
-            key={section.title}
-          >
+          <div id={section.id} className="mx-auto my-20 max-w-7xl scroll-mt-20" key={section.title}>
             <div>
               <h2 className="capitalize font-semibold">{section.title}</h2>
               <p className="my-1">{section.subtitle}</p>
